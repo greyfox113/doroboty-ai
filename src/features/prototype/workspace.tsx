@@ -16,6 +16,8 @@ import { CvAttachment } from "./cv-attachment";
 import { MatchScore } from "./match-score";
 import { RecruitingApplication } from "./recruiting-application";
 import { CandidateApplication } from "./candidate-application";
+import { OwnWorkStep } from "@/features/applications/own-work-step";
+import { answeredExamples, ownWorkPrompts } from "@/features/applications/own-work";
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -239,6 +241,8 @@ export function ApplyPage() {
   const notes = draft?.notes ?? "";
   const generated = draft?.generated ?? "";
   const [answer, setAnswer] = useState(draft?.answer ?? "");
+  const [examples, setExamples] = useState<string[]>(draft?.examples ?? []);
+  const [declared, setDeclared] = useState(false);
   const [consent, setConsent] = useState(false);
   const [message, setMessage] = useState("");
   const [attempted, setAttempted] = useState(false);
@@ -256,6 +260,9 @@ export function ApplyPage() {
   const answerLength = answer.trim().length;
   const answerInvalid = attempted && answerLength < MIN_APPLICATION_ANSWER_LENGTH;
   const consentInvalid = attempted && !consent;
+  const prompts = job ? ownWorkPrompts(job.category) : [];
+  const filledExamples = answeredExamples(prompts, examples);
+  const declarationInvalid = attempted && filledExamples.length > 0 && !declared;
   if (!job) return <NotFound />;
   const existing = state.applications.find(
     (x) => x.jobId === job.id && x.candidateId === person.id,
@@ -277,11 +284,26 @@ export function ApplyPage() {
       answerInput.current?.focus();
       return;
     }
+    if (filledExamples.length > 0 && !declared) {
+      document.getElementById("own-work-declaration")?.focus();
+      return;
+    }
     if (!consent) {
       document.getElementById("application-consent")?.focus();
       return;
     }
-    if (run({ type: "submit", jobId: job!.id, notes, generated, answer, consent })) {
+    if (
+      run({
+        type: "submit",
+        jobId: job!.id,
+        notes,
+        generated,
+        answer,
+        consent,
+        examples: filledExamples,
+        declaredOwnWork: filledExamples.length > 0 && declared,
+      })
+    ) {
       submittedOnce.current = true;
       setSubmitted(true);
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -313,6 +335,7 @@ export function ApplyPage() {
             </p>
           </header>
           <section className="application-form-section" aria-labelledby="application-cv-title">
+            <p className="own-work-step">Krok 1 z 3</p>
             <h3 id="application-cv-title">Twoje CV</h3>
             <p className="application-help">Do aplikacji dołączymy CV z Twojego profilu.</p>
             <CvAttachment
@@ -352,7 +375,25 @@ export function ApplyPage() {
                 : `Minimum ${MIN_APPLICATION_ANSWER_LENGTH} znaków. Obecnie: ${answerLength}.`}
             </p>
           </section>
+          <OwnWorkStep
+            prompts={prompts}
+            answers={examples}
+            onAnswer={(index, value) => {
+              setExamples((list) => {
+                const next = prompts.map((_, i) => list[i] ?? "");
+                next[index] = value;
+                return next;
+              });
+              setDeclared(false);
+              setConsent(false);
+            }}
+            declared={declared}
+            onDeclared={setDeclared}
+            declarationInvalid={declarationInvalid}
+            disabled={submitted}
+          />
           <div className="application-form-section application-submit">
+            <p className="own-work-step">Krok 3 z 3</p>
             <label className="application-consent">
               <Checkbox
                 id="application-consent"
@@ -387,7 +428,7 @@ export function ApplyPage() {
                 disabled={submitted}
                 variant="outline"
                 onClick={() => {
-                  if (run({ type: "draft", jobId: job.id, notes, generated, answer }))
+                  if (run({ type: "draft", jobId: job.id, notes, generated, answer, examples }))
                     setMessage("Szkic został zapisany.");
                 }}
               >
@@ -414,10 +455,12 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
   const { state } = usePrototype();
   const person = currentPerson(state)!;
   const [query, setQuery] = useState("");
+  const [withExamples, setWithExamples] = useState(false);
   const [params] = useSearchParams();
   const applications = state.applications.filter(
     (x) =>
       (employer ? x.companyId === person.companyId : x.candidateId === person.id) &&
+      (!employer || !withExamples || (x.examples?.length ?? 0) > 0) &&
       `${x.candidateName} ${x.jobTitle}`
         .toLocaleLowerCase("pl")
         .includes(query.toLocaleLowerCase("pl")),
@@ -433,6 +476,29 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
       <Field label={employer ? "Szukaj kandydata lub oferty" : "Szukaj oferty"}>
         <Input value={query} onChange={(e) => setQuery(e.target.value)} />
       </Field>
+      {employer && (
+        <fieldset className="own-work-filter">
+          <legend className="sr-only">Pokaż aplikacje</legend>
+          <label>
+            <input
+              type="radio"
+              name="own-work-filter"
+              checked={!withExamples}
+              onChange={() => setWithExamples(false)}
+            />{" "}
+            Wszystkie
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="own-work-filter"
+              checked={withExamples}
+              onChange={() => setWithExamples(true)}
+            />{" "}
+            Z przykładami
+          </label>
+        </fieldset>
+      )}
       <div className="mt-6 space-y-4">
         {applications.length ? (
           applications.map((a) => (
@@ -451,6 +517,12 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
                       : state.companies.find((x) => x.id === a.companyId)?.name}
                   </p>
                   <p>{stageLabels[a.stage]}</p>
+                  {employer && (a.examples?.length ?? 0) > 0 && (
+                    <p className="own-work-signal">
+                      Przykłady pracy: {a.examples!.length}
+                      {a.declaredOwnWork ? " · deklaruje: bez AI" : ""}
+                    </p>
+                  )}
                 </div>
                 <MatchScore score={a.score} />
               </div>

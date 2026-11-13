@@ -8,15 +8,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[var(--gui-color-1)] text-[var(--gui-text)] [--control-hover-bg:#ffacef] shadow-[var(--gui-edge-shadow)]",
+          "bg-[var(--primary)] text-[var(--primary-foreground)] [--control-hover-bg:var(--gui-neutral-9)] [--control-hover-text:var(--primary-foreground)]",
         outline:
-          "bg-white shadow-[var(--gui-edge-shadow)] text-[var(--gui-text)] [--control-hover-bg:var(--gui-color-1-transparent)] aria-expanded:bg-[var(--gui-neutral-3-transparent)]",
+          "bg-[var(--gui-surface)] shadow-[inset_0_0_0_1px_var(--primary)] text-[var(--gui-text)] [--control-hover-bg:var(--gui-color-1-transparent)] aria-expanded:bg-[var(--gui-neutral-3-transparent)]",
         secondary:
           "bg-[var(--gui-surface-muted)] text-[var(--gui-text)] [--control-hover-bg:var(--gui-neutral-4)] aria-expanded:bg-[var(--gui-neutral-4-transparent)]",
         ghost:
           "bg-transparent text-[var(--gui-text)] [--control-hover-bg:var(--gui-color-1-transparent)]",
         destructive:
-          "bg-[var(--gui-error)] [--control-hover-bg:color-mix(in_srgb,var(--gui-error)_85%,var(--gui-text))] text-[var(--gui-neutral-10)] focus-visible:outline-[var(--gui-focus)]",
+          "bg-[var(--gui-error)] [--control-hover-bg:color-mix(in_srgb,var(--gui-error)_85%,var(--gui-text))] text-white [--control-hover-text:white] focus-visible:outline-[var(--gui-focus)]",
         link: "bg-transparent px-0 text-[var(--gui-link)] underline-offset-4 hover:underline [--control-hover-bg:var(--gui-color-1-transparent)]",
       },
       size: {
@@ -47,6 +47,7 @@ function Button({
   return (
     <ButtonPrimitive
       data-slot="button"
+      data-variant={variant}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

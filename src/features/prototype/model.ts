@@ -104,6 +104,11 @@ export const nextStages: Record<Stage, Stage[]> = {
   withdrawn: [],
   hired: [],
 };
+export const ownWorkExampleSchema = z.object({
+  question: z.string().trim().min(1).max(500),
+  answer: z.string().trim().min(1).max(2500),
+});
+export type OwnWorkExample = z.infer<typeof ownWorkExampleSchema>;
 const applicationSchema = z.object({
   id,
   candidateId: id,
@@ -118,6 +123,10 @@ const applicationSchema = z.object({
   score: z.number().int().min(0).max(100),
   summary: text,
   stage: z.enum(stages),
+  // Optional own-work examples (E1). Optional so earlier saved scenarios still parse.
+  examples: z.array(ownWorkExampleSchema).max(2).optional(),
+  declaredOwnWork: z.boolean().optional(),
+  ownWorkNote: text.optional(),
   events: z
     .array(z.object({ stage: z.enum(stages), at: z.iso.datetime(), note: text }))
     .min(1)
@@ -129,6 +138,7 @@ const draftSchema = z.object({
   notes: text,
   generated: text,
   answer: text,
+  examples: z.array(z.string().max(2500)).max(2).optional(),
 });
 export const stateSchema = z
   .object({
@@ -201,7 +211,14 @@ export type Action =
   | { type: "select_person"; id: string | null }
   | { type: "profile"; value: z.infer<typeof profileSchema> }
   | { type: "toggle_saved"; jobId: string }
-  | { type: "draft"; jobId: string; notes: string; generated: string; answer: string }
+  | {
+      type: "draft";
+      jobId: string;
+      notes: string;
+      generated: string;
+      answer: string;
+      examples?: string[];
+    }
   | {
       type: "submit";
       jobId: string;
@@ -209,7 +226,10 @@ export type Action =
       generated: string;
       answer: string;
       consent: boolean;
+      examples?: OwnWorkExample[];
+      declaredOwnWork?: boolean;
     }
+  | { type: "own_work_note"; applicationId: string; note: string }
   | { type: "stage"; applicationId: string; stage: Stage; note: string }
   | { type: "withdraw"; applicationId: string }
   | { type: "publish"; job: z.infer<typeof jobSchema> }
@@ -298,6 +318,12 @@ export function transition(
     if (!action.consent) fail("Zatwierdź treść i zgodę na przesłanie aplikacji.");
     if (s.applications.some((x) => x.candidateId === p.id && x.jobId === job.id))
       fail("Aplikacja na tę ofertę została już wysłana.");
+    const examples = z
+      .array(ownWorkExampleSchema)
+      .max(2)
+      .parse(action.examples ?? []);
+    if (examples.length > 0 && !action.declaredOwnWork)
+      fail("Zaznacz oświadczenie, że przykłady napisałeś/napisałaś samodzielnie.");
     s.applications.push(
       applicationSchema.parse({
         id: newId,
@@ -313,6 +339,7 @@ export function transition(
         score: p.exampleScore,
         summary: p.exampleSummary,
         stage: "submitted",
+        ...(examples.length > 0 ? { examples, declaredOwnWork: true } : {}),
         events: [{ stage: "submitted", at: now, note: "" }],
       }),
     );
@@ -335,6 +362,12 @@ export function transition(
     }
     application.stage = stage;
     application.events.push({ stage, at: now, note: action.type === "stage" ? action.note : "" });
+  } else if (action.type === "own_work_note") {
+    const p = employer();
+    const application = s.applications.find((x) => x.id === action.applicationId);
+    if (!application || application.companyId !== p.companyId)
+      return fail("Nie znaleziono aplikacji.");
+    application.ownWorkNote = text.parse(action.note);
   } else if (action.type === "publish") {
     const p = employer();
     const job = jobSchema.parse(action.job);

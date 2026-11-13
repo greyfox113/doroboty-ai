@@ -289,7 +289,7 @@ test("mobile navigation, light-only appearance and keyboard person selection", a
   await page.reload();
   await expect(page.getByRole("combobox", { name: "Motyw" })).toHaveCount(0);
   await expect(page.locator("html")).not.toHaveClass(/dark/);
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(244, 244, 240)");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(247, 237, 218)");
   await page.screenshot({ path: "artifacts/settings-mobile-light.png", fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
@@ -370,7 +370,8 @@ for (const width of [1440, 375]) {
     const form = page.locator("main form");
     const answer = page.getByLabel("Dlaczego pasujesz do tej roli?");
     await expect(answer).toHaveValue(draft.answer);
-    await expect(form.getByRole("textbox")).toHaveCount(1);
+    // The answer plus the two optional E1 own-work examples (empty for a legacy draft).
+    await expect(form.getByRole("textbox")).toHaveCount(3);
     await expect(page.getByLabel("Twoje notatki do aplikacji (opcjonalnie)")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Przygotuj propozycję z AI" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Użyj propozycji" })).toHaveCount(0);
@@ -388,18 +389,25 @@ for (const width of [1440, 375]) {
         ),
       ),
     ).toBe(true);
+    // Keyboard order: answer → optional E1 step (example, "Popraw literówki", ×2) → approval.
+    const ownWork = form.locator("section.own-work");
+    const ownWorkStops = 4;
     await answer.focus();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("checkbox")).toBeFocused();
+    await expect(ownWork.getByRole("textbox").first()).toBeFocused();
+    for (let i = 1; i < ownWorkStops; i++) await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await expect(
+      page.getByRole("checkbox", { name: "Zatwierdzam treść i przesłanie aplikacji" }),
+    ).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "Wyślij aplikację", exact: true })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "Zapisz szkic", exact: true })).toBeFocused();
     const editedAnswer = "Moja poprawiona odpowiedź opisuje doświadczenie potrzebne w tej roli.";
     await answer.fill(editedAnswer);
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
+    for (let i = 0; i < ownWorkStops + 3; i++) await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Zapisz szkic", exact: true })).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("status")).toHaveText("Szkic został zapisany.");
     expect(
@@ -407,7 +415,7 @@ for (const width of [1440, 375]) {
         (key) => JSON.parse(localStorage.getItem(key)!).drafts.at(-1),
         STORAGE_KEY,
       ),
-    ).toEqual({ ...draft, answer: editedAnswer });
+    ).toEqual({ ...draft, answer: editedAnswer, examples: [] });
     await page.reload();
     await expect(answer).toHaveValue(editedAnswer);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -418,7 +426,7 @@ for (const width of [1440, 375]) {
       fullPage: true,
     });
     await answer.focus();
-    await page.keyboard.press("Tab");
+    for (let i = 0; i <= ownWorkStops; i++) await page.keyboard.press("Tab");
     await page.keyboard.press("Space");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
@@ -458,7 +466,7 @@ test("legacy dark preference keeps scenario data and renders the light interface
     "Zachowaj mój profil",
   );
   await expect(page.locator("html")).not.toHaveClass(/dark/);
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(244, 244, 240)");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(247, 237, 218)");
   await page.getByRole("button", { name: "Zapisz profil", exact: true }).click();
   expect(
     await page.evaluate((key) => JSON.parse(localStorage.getItem(key)!).theme, STORAGE_KEY),
@@ -655,8 +663,9 @@ test("homepage surfaces and marketplace action type roles match the shared refer
   const cards = page.locator("main article.prototype-panel");
   await expect(cards).toHaveCount(3);
   for (const card of await cards.all()) {
-    await expect(card).toHaveCSS("border-radius", "24px");
-    await expect(card).toHaveCSS("box-shadow", /rgb\(24, 24, 24\).*1px inset/);
+    // DoRoboty theme (owner decision): 8px cards with a light navy shadow.
+    await expect(card).toHaveCSS("border-radius", "8px");
+    await expect(card).toHaveCSS("box-shadow", /rgba\(25, 47, 82, 0\.06\)/);
   }
   for (const [width, searchSize, offerSize, payLine] of [
     [1280, "14px", "14px", "34.8px"],
@@ -735,7 +744,8 @@ test("process sheet keeps notes across keyboard tabs and saves stage history wit
   await page.getByRole("button", { name: "Proces zakończony", exact: true }).click();
   await expect(page.locator(".record-stage")).toBeFocused();
   await expect(note).toHaveCount(0);
-  await expect(page.locator(".record-actions")).toHaveCount(0);
+  // The recruiter own-work note keeps its own save action; process actions are gone.
+  await expect(page.locator(":not(.own-work-note) > .record-actions")).toHaveCount(0);
   await expect(page.locator(".process-timeline li")).toHaveCount(3);
   const accessibility = await new AxeBuilder({ page }).include(".recruiting-record").analyze();
   expect(accessibility.violations).toEqual([]);
@@ -994,4 +1004,61 @@ test("candidate snapshot supports custom CV and long content at desktop and mobi
   await expect(page.getByRole("tabpanel", { name: "Odpowiedź", exact: true })).toContainText(
     record.answer,
   );
+});
+
+test("optional own-work examples reach the recruiter, who filters and answers before inviting", async ({
+  page,
+}) => {
+  await choose(page, "Anna Kowalska");
+  await page.goto("/#/aplikuj/ai-product-manager");
+  await expect(page.getByRole("heading", { name: "Twoja praca", exact: true })).toBeVisible();
+  await page
+    .getByLabel("Dlaczego pasujesz do tej roli?")
+    .fill("Prowadziłam wdrożenia AI w zespole produktowym i mierzyłam ich efekt.");
+  const first = page.getByRole("textbox", { name: /prowadziłeś\/prowadziłaś wdrożenie AI/ });
+  await first.fill(
+    "napewno sama poprowadziłam pilotaż asystenta ,zespół 6 osób.czas obsługi spadł",
+  );
+  await page.getByRole("button", { name: "Popraw literówki" }).first().click();
+  await expect(first).toHaveValue(
+    "Na pewno sama poprowadziłam pilotaż asystenta, zespół 6 osób. Czas obsługi spadł",
+  );
+  await page.getByRole("checkbox", { name: "Zatwierdzam treść i przesłanie aplikacji" }).check();
+  await page.getByRole("button", { name: "Wyślij aplikację", exact: true }).click();
+  await expect(page.getByText("Zaznacz oświadczenie albo usuń treść przykładów.")).toBeVisible();
+  await page
+    .getByRole("checkbox", { name: "Oświadczam, że przykłady napisałem/napisałam samodzielnie" })
+    .check();
+  await page.getByRole("checkbox", { name: "Zatwierdzam treść i przesłanie aplikacji" }).check();
+  await page.getByRole("button", { name: "Wyślij aplikację", exact: true }).click();
+  await expect(page.getByText("Aplikacja została wysłana.", { exact: false })).toBeVisible();
+
+  await choose(page, "Karolina Wiśniewska");
+  await page.getByRole("link", { name: "Kandydaci", exact: true }).click();
+  await page.getByText("Z przykładami", { exact: true }).click();
+  await expect(page.getByRole("link", { name: "Marek Nowak", exact: true })).toHaveCount(0);
+  await expect(page.getByText("Przykłady pracy: 1 · deklaruje: bez AI")).toBeVisible();
+  await page.getByRole("link", { name: "Anna Kowalska", exact: true }).click();
+  await expect(page.getByText("pilotaż asystenta", { exact: false })).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "Co ta osoba zrobiła sama i z jakim skutkiem?" })
+    .fill("Sama poprowadziła pilotaż asystenta w zespole 6 osób; czas obsługi spadł.");
+  await page.getByRole("button", { name: "Zapisz odpowiedź" }).click();
+  await expect(page.getByText("Zapisano odpowiedź.")).toBeVisible();
+  await page.getByRole("button", { name: "W przeglądzie", exact: true }).click();
+  await page.getByRole("button", { name: "Zaproszenie na rozmowę", exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByRole("textbox", { name: "Co ta osoba zrobiła sama i z jakim skutkiem?" }),
+  ).toHaveValue("Sama poprowadziła pilotaż asystenta w zespole 6 osób; czas obsługi spadł.");
+  await expect(page.locator(".record-stage")).toHaveText("Zaproszenie na rozmowę");
+});
+
+test("footer tells visitors where to report a problem", async ({ page }) => {
+  await page.goto("/#/");
+  const report = page
+    .getByRole("navigation", { name: "Stopka" })
+    .getByRole("link", { name: "Zgłoś problem" });
+  await expect(report).toHaveAttribute("href", "https://github.com/greyfox113/doroboty-ai/issues");
+  await expect(report).toHaveAttribute("rel", "noreferrer");
 });

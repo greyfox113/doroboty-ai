@@ -24,7 +24,16 @@ export function ApplicationRecord({
 }: {
   application: Pick<
     Application,
-    "candidateId" | "candidateName" | "jobTitle" | "stage" | "answer" | "cv" | "score" | "summary"
+    | "candidateId"
+    | "candidateName"
+    | "jobTitle"
+    | "stage"
+    | "answer"
+    | "cv"
+    | "score"
+    | "summary"
+    | "examples"
+    | "declaredOwnWork"
   >;
   companyName: string;
   audience: "candidate" | "employer";
@@ -75,6 +84,11 @@ export function ApplicationRecord({
                 <>
                   <h3>Przesłana aplikacja</h3>
                   <p>{application.answer}</p>
+                  <OwnWorkExamples
+                    examples={application.examples ?? []}
+                    declared={application.declaredOwnWork ?? false}
+                    candidate={candidate}
+                  />
                 </>
               ),
             },
@@ -117,5 +131,45 @@ export function ApplicationRecord({
         </aside>
       </div>
     </article>
+  );
+}
+
+function OwnWorkExamples({
+  examples,
+  declared,
+  candidate,
+}: {
+  examples: NonNullable<Application["examples"]>;
+  declared: boolean;
+  candidate: boolean;
+}) {
+  return (
+    <section className="own-work-record" aria-labelledby="own-work-record-title">
+      <h3 id="own-work-record-title">Przykłady pracy</h3>
+      {examples.length ? (
+        <>
+          <p className="record-caption">
+            {declared
+              ? "Kandydat deklaruje, że napisał te odpowiedzi samodzielnie (AI najwyżej poprawiło literówki). To deklaracja, nie gwarancja."
+              : "Przykłady bez oświadczenia."}
+          </p>
+          {examples.map((example) => (
+            <div className="own-work-pair" key={example.question}>
+              <p className="own-work-pair-question">{example.question}</p>
+              <div className="own-work-human">
+                <span className="own-work-human-label">{candidate ? "Ty" : "Kandydat"}</span>
+                <p>{example.answer}</p>
+              </div>
+            </div>
+          ))}
+        </>
+      ) : (
+        <p className="record-caption">
+          {candidate
+            ? "Nie dodałeś/dodałaś przykładów pracy. To niczego nie obniża."
+            : "Kandydat nie dodał przykładów pracy. Brak przykładów nie obniża Match Score."}
+        </p>
+      )}
+    </section>
   );
 }

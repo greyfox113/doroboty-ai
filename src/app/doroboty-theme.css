@@ -1,0 +1,504 @@
+/*
+ * DoRoboty theme layer (owner decision, 13.11.2026: "zachowaj mój design projektu").
+ * Re-maps the Poster People host tokens to the DoRoboty design system from the
+ * discovery project (doroboty-discovery/design-system/tokens.css): K3 layout,
+ * K2 warm colours, K1 buttons. Imported last in globals.css so it wins over the
+ * Poster People adaptation without editing the immutable kit.
+ *
+ * Roles: cream page background, warm-white cards, navy headings, black only for
+ * the primary action, sea green for links and signals, red only for errors.
+ */
+:root {
+  /* DoRoboty source tokens (names kept from the discovery design system) */
+  --ds-bg: #f7edda;
+  --ds-surface: #fffdf8;
+  --ds-surface-2: #fbf5ea;
+  --ds-line: #e6dac4;
+  --ds-line-control: #958773;
+  --ds-ink: #1d1d1d;
+  --ds-ink-heading: #192f52;
+  --ds-ink-muted: #5e5a52;
+  --ds-ink-strong: #110f15;
+  --ds-on-strong: #ffffff;
+  --ds-accent: #1e5f67;
+  --ds-accent-tint: #ddedec;
+  --ds-accent-2: #4eabbf;
+  --ds-must-tint: #e3e8f1;
+  --ds-danger: #d54441;
+  --ds-danger-text: #b8322f;
+  --ds-focus: #2c75b1;
+  --ds-radius-control: 6px;
+  --ds-radius-card: 8px;
+  --ds-radius-tile: 12px;
+  --ds-shadow-card: 0 4px 14px rgba(25, 47, 82, 0.06);
+  --ds-font: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Host typography: one typeface (Inter), no serif display */
+  --gui-font-brand: var(--ds-font);
+  --gui-font-ui: var(--ds-font);
+  --gui-font-editorial: var(--ds-font);
+  --gui-font-data: var(--ds-font);
+  --weight-brand-regular: 700;
+  --weight-brand-medium: 700;
+  --weight-brand-heavy: 800;
+
+  /* Host shape */
+  --gui-radius-xs: 4px;
+  --gui-radius-s: var(--ds-radius-control);
+  --gui-radius-m: var(--ds-radius-card);
+  --gui-radius-l: var(--ds-radius-card);
+  --gui-radius-xl: var(--ds-radius-tile);
+
+  /* Host colours */
+  --gui-neutral-3: var(--ds-surface-2);
+  --gui-neutral-4: var(--ds-line);
+  --gui-neutral-8: var(--ds-ink-muted);
+  --gui-neutral-9: #2a2830;
+  --gui-neutral-10: var(--ds-ink-strong);
+  --gui-color-1: var(--ds-accent-tint);
+  --gui-color-1-transparent: #eef6f5;
+  --gui-color-2: var(--ds-accent);
+  --gui-color-3: var(--ds-must-tint);
+  --gui-color-4: #f8e8cf;
+  --gui-error: var(--ds-danger-text);
+  --gui-error-transparent: #b8322f1f;
+  --gui-canvas: var(--ds-bg);
+  --gui-surface: var(--ds-surface);
+  --gui-surface-muted: var(--ds-surface-2);
+  --gui-text: var(--ds-ink);
+  --gui-text-muted: var(--ds-ink-muted);
+  --gui-text-muted-accessible: var(--ds-ink-muted);
+  --gui-edge: var(--ds-line);
+  --gui-accent-text: var(--ds-accent);
+  --gui-accent-text-accessible: var(--ds-accent);
+  --gui-focus: var(--ds-focus);
+  --gui-link: var(--ds-accent);
+  --gui-control: #ffffff;
+  --gui-control-hover: var(--ds-surface-2);
+  --gui-shadow-m: var(--ds-shadow-card);
+  --gui-edge-shadow: inset 0 0 0 1px var(--ds-line);
+  --gui-control-shadow: inset 0 0 0 1px var(--ds-line-control);
+  --gui-accent-bar-shadow: inset 4px 0 var(--ds-accent);
+
+  /* shadcn bridge */
+  --primary: var(--ds-ink-strong);
+  --primary-foreground: var(--ds-on-strong);
+  --accent: var(--ds-accent-tint);
+  --accent-foreground: var(--ds-accent);
+  --destructive: var(--ds-danger-text);
+  --border: var(--ds-line);
+  --ring: var(--ds-focus);
+
+  /* Poster People marketplace namespace */
+  --pp-paper: var(--ds-bg);
+  --pp-surface: var(--ds-surface);
+  --pp-ink: var(--ds-ink);
+  --pp-muted: var(--ds-ink-muted);
+  --pp-line: var(--ds-line);
+  --pp-action: var(--ds-accent-2);
+  --pp-action-hover: var(--ds-accent-tint);
+  --pp-fact: var(--ds-surface-2);
+  --pp-yellow: var(--ds-must-tint);
+  --pp-surface-hover: #fffaf0;
+}
+
+body {
+  font-family: var(--ds-font);
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+}
+
+/* Headings: navy, bold Inter, tight tracking (replaces Geist Serif 400) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+[data-slot="dialog-title"],
+[data-slot="alert-dialog-title"] {
+  font-family: var(--ds-font);
+  font-weight: 700;
+  color: var(--ds-ink-heading);
+}
+h1 {
+  font-size: 40px;
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-size: 26px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-size: 19px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.home-intro h1,
+.page-heading h1 {
+  font-size: 48px;
+  letter-spacing: -0.02em;
+}
+@media (max-width: 850px) {
+  h1,
+  .home-intro h1,
+  .page-heading h1 {
+    font-size: 32px;
+  }
+  h2 {
+    font-size: 22px;
+  }
+}
+
+/* Header and footer sit on the cream page, separated by a line */
+header:has([aria-label="Główna nawigacja"]) {
+  background: rgba(247, 237, 218, 0.94);
+  border-bottom: 1px solid var(--ds-line);
+}
+footer,
+.sidebar,
+.topbar {
+  background: var(--ds-bg);
+}
+header a[aria-label="DoRoboty.ai — strona główna"],
+.brand {
+  font-family: var(--ds-font);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink-heading);
+}
+nav[aria-label="Główna nawigacja"] a {
+  white-space: nowrap;
+}
+/* Tablet: the bold Inter wordmark is wider than Geist Serif, so tighten the bar
+   to keep "Zmień osobę" on screen at 768–1023px. */
+@media (max-width: 1023px) {
+  header:has([aria-label="Główna nawigacja"]) > div {
+    padding-inline: 20px;
+  }
+  header a[aria-label="DoRoboty.ai — strona główna"] {
+    font-size: 22px;
+  }
+  nav[aria-label="Główna nawigacja"] {
+    gap: 12px;
+  }
+}
+
+/* Cards (K3): warm white, line border, light shadow, 8px radius */
+.prototype-panel,
+.metric-card,
+.visitors-card,
+.success-panel,
+.prototype-form {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+  box-shadow: var(--ds-shadow-card);
+}
+.prototype-panel .prototype-form {
+  border: 0;
+  box-shadow: none;
+}
+.prototype-notice {
+  background: var(--ds-accent-tint);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+}
+.prototype-error,
+.error-message {
+  color: var(--ds-danger-text);
+  border-color: var(--ds-danger);
+}
+.nav-active,
+.nav-active:hover {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+}
+.workspace-avatar {
+  background: var(--ds-accent-tint);
+  color: var(--ds-accent);
+  border-radius: var(--ds-radius-control);
+}
+.page-heading {
+  border-bottom-color: var(--ds-line);
+}
+.native-select {
+  border-color: var(--ds-line-control);
+}
+[data-slot="select-trigger"],
+[data-slot="checkbox"] {
+  box-shadow: inset 0 0 0 1px var(--ds-line-control);
+}
+[data-slot="checkbox"] {
+  border-radius: 3px;
+}
+[data-slot="badge"] {
+  box-shadow: inset 0 0 0 1px var(--ds-line);
+}
+[data-slot="dialog-content"],
+[data-slot="alert-dialog-content"] {
+  border-color: var(--ds-line);
+}
+input[data-slot="input"],
+textarea[data-slot="textarea"],
+textarea {
+  box-shadow: inset 0 0 0 1px var(--ds-line-control);
+}
+input[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  box-shadow: inset 0 0 0 2px var(--ds-danger);
+}
+
+/* Marketplace: search submit is the primary action (black), selected tab black */
+.pp-search-submit {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+  border-color: var(--ds-ink-strong);
+  border-radius: var(--ds-radius-control);
+  --control-hover-bg: var(--gui-neutral-9);
+  --control-hover-text: var(--ds-on-strong);
+}
+.pp-category-tab.pp-selected {
+  background: var(--ds-ink-strong);
+}
+.pp-category-tab.pp-selected small {
+  color: #e9e4da;
+}
+.pp-job-topline .pp-separator {
+  color: var(--ds-ink-muted);
+}
+
+/* Own-work examples (E1): application step, recruiter record and list filter */
+.own-work-step {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+  margin: 0 0 4px;
+}
+.own-work-item {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-surface-2);
+  min-width: 0;
+}
+.own-work-item legend {
+  padding: 0 4px;
+  font-weight: 600;
+  color: var(--ds-ink-heading);
+}
+.own-work-tag,
+.own-work-signal {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 10px;
+  background: var(--ds-must-tint);
+  color: var(--ds-ink-heading);
+}
+.own-work-signal {
+  margin-top: 8px;
+  background: var(--ds-accent-tint);
+  color: var(--ds-accent);
+}
+.own-work-question {
+  display: block;
+  margin: 10px 0 6px;
+  font-weight: 600;
+}
+.own-work-prompts {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  list-style: disc;
+  color: var(--ds-ink-muted);
+  font-size: 14px;
+}
+.own-work-count {
+  text-align: right;
+  margin: 4px 0 0;
+}
+.own-work-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.own-work-declaration {
+  margin-top: 16px;
+}
+.own-work-record {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ds-line);
+}
+.own-work-pair {
+  margin-top: 14px;
+}
+.own-work-pair-question {
+  font-size: 14px;
+  color: var(--ds-ink-muted);
+  margin: 0 0 6px;
+}
+/* "Słowa człowieka" tile (K1): black tile, human label */
+.own-work-human {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+  border-radius: var(--ds-radius-tile);
+  padding: 12px 14px;
+}
+.own-work-human p {
+  margin: 4px 0 0;
+  white-space: pre-line;
+}
+.own-work-human-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.own-work-note {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.own-work-note .record-actions {
+  align-items: center;
+  margin-top: 8px;
+}
+/* Segmented filter (DoRoboty .ds-segment) */
+.own-work-filter {
+  display: inline-flex;
+  gap: 3px;
+  margin: 16px 0 0;
+  padding: 3px;
+  border: 1px solid var(--ds-ink-strong);
+  border-radius: var(--ds-radius-control);
+  background: var(--ds-surface);
+}
+.own-work-filter label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.own-work-filter input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.own-work-filter label:has(input:checked) {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+}
+.own-work-filter label:has(input:focus-visible) {
+  outline: 3px solid var(--ds-focus);
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  .own-work-filter {
+    display: flex;
+  }
+  .own-work-filter label {
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 44px;
+  }
+}
+
+/* Button states (owner decision 13.11.2026, "Zatwierdzam"): hover = heading navy + elevation,
+   active = dark sea green. Mirrors doroboty-discovery/design-system/components.css "Stany". */
+:root {
+  --ds-btn-hover: var(--ds-ink-heading);
+  --ds-btn-active: var(--ds-accent);
+  --ds-elev-hover: 0 4px 10px rgba(25, 47, 82, 0.22), 0 1px 2px rgba(25, 47, 82, 0.18);
+}
+[data-slot="button"],
+.pp-search-submit {
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease,
+    transform 80ms ease;
+}
+[data-slot="button"][data-variant="default"]:not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled]
+  ):hover,
+.pp-search-submit:hover {
+  background: var(--ds-btn-hover);
+  border-color: var(--ds-btn-hover);
+  color: var(--ds-on-strong);
+  box-shadow: var(--ds-elev-hover);
+  transform: translateY(-1px);
+}
+[data-slot="button"][data-variant="default"]:not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled]
+  ):active,
+.pp-search-submit:active {
+  background: var(--ds-btn-active);
+  border-color: var(--ds-btn-active);
+  color: var(--ds-on-strong);
+  box-shadow: none;
+  transform: none;
+}
+[data-slot="button"]:is([data-variant="outline"], [data-variant="secondary"]):not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled]
+  ):hover {
+  color: var(--ds-btn-hover);
+  box-shadow:
+    inset 0 0 0 1px var(--ds-btn-hover),
+    var(--ds-elev-hover);
+  transform: translateY(-1px);
+}
+[data-slot="button"]:is([data-variant="outline"], [data-variant="secondary"]):not(
+    :disabled,
+    [aria-disabled="true"],
+    [data-disabled]
+  ):active {
+  color: var(--ds-btn-active);
+  background: var(--ds-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--ds-btn-active);
+  transform: none;
+}
+@media (hover: none) {
+  [data-slot="button"]:hover,
+  .pp-search-submit:hover {
+    box-shadow: none;
+    transform: none;
+  }
+  [data-slot="button"]:is([data-variant="outline"], [data-variant="secondary"]):hover {
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="button"],
+  .pp-search-submit {
+    transition: none;
+  }
+  [data-slot="button"]:hover,
+  [data-slot="button"]:active,
+  .pp-search-submit:hover,
+  .pp-search-submit:active {
+    transform: none;
+  }
+}

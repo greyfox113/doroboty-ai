@@ -8,6 +8,8 @@ import { usePrototype } from "./store";
 export function RecruitingApplication({ application }: { application: Application }) {
   const { state, run } = usePrototype();
   const [note, setNote] = useState("");
+  const [ownWork, setOwnWork] = useState(application.ownWorkNote ?? "");
+  const [ownWorkStatus, setOwnWorkStatus] = useState("");
   const [announcement, setAnnouncement] = useState("");
   const statusRef = useRef<HTMLSpanElement>(null);
   const pendingFocus = useRef(false);
@@ -58,6 +60,40 @@ export function RecruitingApplication({ application }: { application: Applicatio
           )
         }
       >
+        <section className="own-work-note" aria-labelledby="own-work-note-title">
+          <h3 id="own-work-note-title">
+            <label htmlFor="own-work-note">Co ta osoba zrobiła sama i z jakim skutkiem?</label>
+          </h3>
+          <p className="record-caption" id="own-work-note-hint">
+            Odpowiedz krótko przed zaproszeniem na rozmowę. Jeśli nie wiesz, wpisz „nie wiem”.
+          </p>
+          <Textarea
+            id="own-work-note"
+            aria-describedby="own-work-note-hint"
+            maxLength={12000}
+            rows={3}
+            value={ownWork}
+            onChange={(event) => {
+              setOwnWork(event.target.value);
+              setOwnWorkStatus("");
+            }}
+          />
+          <div className="record-actions">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                if (run({ type: "own_work_note", applicationId: application.id, note: ownWork }))
+                  setOwnWorkStatus("Zapisano odpowiedź.");
+              }}
+            >
+              Zapisz odpowiedź
+            </Button>
+            <span className="record-caption" aria-live="polite">
+              {ownWorkStatus}
+            </span>
+          </div>
+        </section>
         {availableStages.length > 0 ? (
           <>
             <h3>
