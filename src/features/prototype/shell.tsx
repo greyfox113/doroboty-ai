@@ -16,13 +16,13 @@ import {
 } from "lucide-react";
 import { BrandMark } from "@/features/public/brand-mark";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { illustrations } from "@/features/public/illustrations";
 import { currentPerson } from "./model";
 import { usePrototype } from "./store";
-import { cn } from "@/lib/utils";
-const navigation = [
-  { to: "/oferty", label: "Oferty" },
-  { to: "/metodologia", label: "Metodologia" },
-  { to: "/auth/sign-in?audience=employer&next=/app/oferty", label: "Dla firm" },
+const navigation: { to: { pathname: string; hash?: string }; label: string }[] = [
+  { to: { pathname: "/oferty" }, label: "Oferty" },
+  { to: { pathname: "/", hash: "#jak-aplikowac" }, label: "Jak aplikować" },
+  { to: { pathname: "/dla-firm" }, label: "Dla firm" },
 ];
 
 export function Notice({ children }: { children: ReactNode }) {
@@ -204,58 +204,37 @@ export function Shell() {
         </div>
       ) : (
         <>
-          <header className="bg-background/95 shadow-[var(--gui-divider-bottom-shadow)] backdrop-blur supports-[backdrop-filter]:bg-background/80">
-            <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between gap-4 px-5 lg:px-8">
-              <Link
-                className="flex items-center gap-2.5 text-base font-semibold tracking-[var(--gui-tracking-s)]"
-                to="/"
-                aria-label="DoRoboty.ai — strona główna"
-              >
-                <BrandMark />
-                <span>DoRoboty.ai</span>
+          <header className="dr-head">
+            <div className="dr-wrap dr-head-row">
+              <Link className="dr-wordmark" to="/" aria-label="DoRoboty.ai — strona główna">
+                DoRoboty<span>.ai</span>
               </Link>
-              <nav aria-label="Główna nawigacja" className="flex items-center gap-2 sm:gap-5">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.to}
-                    className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:inline"
-                    to={item.to}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                {person ? (
-                  <div className="flex items-center gap-[var(--gui-space-xs)] sm:gap-[var(--gui-space-m)]">
-                    {person.role === "candidate" && (
-                      <>
-                        <Link
-                          className="hidden text-sm font-medium text-muted-foreground md:inline"
-                          to="/app/aplikacje"
-                        >
-                          Aplikacje
-                        </Link>
-                        <Link
-                          className="hidden text-sm font-medium text-muted-foreground md:inline"
-                          to="/app/profil"
-                        >
-                          Profil
-                        </Link>
-                      </>
-                    )}
-                    <Link
-                      to="/app"
-                      className={cn(
-                        buttonVariants({ variant: "outline", size: "lg" }),
-                        "text-sm font-medium max-sm:min-h-10 max-sm:px-[var(--gui-space-xs)] max-sm:text-sm",
-                      )}
+              <nav aria-label="Główna nawigacja" className="dr-head-nav">
+                <div className="dr-head-links">
+                  {navigation.map((item) => (
+                    <NavLink
+                      key={item.label}
+                      to={item.to}
+                      end
+                      className={({ isActive }) => (isActive && !item.to.hash ? "dr-current" : "")}
                     >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                  {person?.role === "candidate" && (
+                    <>
+                      <Link to="/app/aplikacje">Aplikacje</Link>
+                      <Link to="/app/profil">Profil</Link>
+                    </>
+                  )}
+                </div>
+                {person ? (
+                  <div className="dr-head-actions">
+                    <Link to="/app" className="ds-btn ds-btn--secondary">
                       Moje konto
                     </Link>
                     <Link
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "hidden md:inline-flex",
-                      )}
+                      className="dr-head-icon"
                       to="/auth/sign-in"
                       aria-label="Zmień osobę"
                       title="Zmień osobę"
@@ -264,17 +243,14 @@ export function Shell() {
                     </Link>
                   </div>
                 ) : (
-                  <>
-                    <Link
-                      to="/auth/sign-in?audience=candidate"
-                      className={cn(
-                        buttonVariants({ variant: "outline", size: "lg" }),
-                        "text-sm font-medium max-sm:min-h-10 max-sm:px-[var(--gui-space-xs)] max-sm:text-sm",
-                      )}
-                    >
-                      Wybierz osobę
+                  <div className="dr-head-actions">
+                    <Link className="dr-head-login" to="/auth/sign-in?audience=candidate">
+                      Zaloguj się
                     </Link>
-                  </>
+                    <Link className="ds-btn ds-btn--secondary dr-head-cta" to="/dla-firm">
+                      Dodaj ogłoszenie
+                    </Link>
+                  </div>
                 )}
               </nav>
             </div>
@@ -282,39 +258,31 @@ export function Shell() {
           <main id="main" ref={main} tabIndex={-1} className="outline-none">
             {content}
           </main>
-          <footer className="bg-muted/40 text-foreground shadow-[var(--gui-divider-top-shadow)]">
-            <div className="mx-auto grid max-w-[1360px] gap-10 px-5 py-12 sm:grid-cols-2 lg:px-8">
-              <div>
-                <p className="text-base font-semibold">DoRoboty.ai</p>
-                <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
-                  Praca dla ludzi, którzy potrafią z AI zbudować coś wartościowego — nie tylko
-                  wpisać je do CV.
-                </p>
-              </div>
-              <nav
-                aria-label="Stopka"
-                className="flex flex-wrap content-start gap-x-6 gap-y-3 text-sm text-muted-foreground sm:justify-end"
-              >
+          <img className="dr-foot-wave" src={illustrations.ribbon} alt="" />
+          <footer className="dr-foot">
+            <div className="dr-wrap">
+              <nav aria-label="Stopka" className="dr-foot-links">
                 <Link to="/oferty">Oferty</Link>
+                <Link to="/dla-firm">Dla firm</Link>
                 <Link to="/metodologia">Metodologia</Link>
+                <Link to="/regulamin">Regulamin</Link>
                 <Link to="/polityka-prywatnosci">Prywatność</Link>
                 <a
-                  className="inline-flex items-center gap-1"
                   href="https://github.com/greyfox113/doroboty-ai/issues"
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Zgłoś problem <ArrowUpRight className="size-4" />
+                  Zgłoś problem <ArrowUpRight className="inline size-4" aria-hidden="true" />
                 </a>
-                <Link className="inline-flex items-center gap-1" to="/auth/sign-in">
-                  Strefa case <ArrowUpRight className="size-4" />
-                </Link>
+                <Link to="/auth/sign-in">Strefa case</Link>
               </nav>
-            </div>
-            <div className="px-5 py-4 text-xs text-muted-foreground shadow-[var(--gui-divider-top-shadow)] lg:px-8">
-              <div className="mx-auto max-w-[1360px]">
-                © {new Date().getFullYear()} DoRoboty.ai — od Superhero.tech
-              </div>
+              <p>
+                <b>DoRoboty.ai</b> · praca dla specjalistów i specjalistek AI
+              </p>
+              <p className="ds-meta">
+                Prototyp kursowy. Firmy, oferty, osoby i adresy są fikcyjne. ©{" "}
+                {new Date().getFullYear()} DoRoboty.ai — od Superhero.tech
+              </p>
             </div>
           </footer>
         </>

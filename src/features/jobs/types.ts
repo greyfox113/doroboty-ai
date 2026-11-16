@@ -36,6 +36,12 @@ export type Company = {
   location: string;
   sizeLabel: string;
   logoUrl?: string;
+  industry?: string;
+  address?: string;
+  remoteTeam?: boolean;
+  values?: string[];
+  benefits?: string[];
+  social?: string[];
 };
 
 export type Job = {
@@ -61,6 +67,17 @@ export type Job = {
   publishedAt: string;
   expiryAt: string;
   verificationStatus: "unverified" | "editorial" | "employer_verified";
+  keySkill?: string;
+  mustHave?: string[];
+  niceToHave?: string[];
+  challenge?: string;
+  duties?: string[];
+  experience?: string;
+  team?: string;
+  tools?: string;
+  workStyle?: string;
+  relocation?: string;
+  responseDays?: number;
 };
 
 export type JobWithCompany = Job & { company: Company };
@@ -73,5 +90,9 @@ export type JobFilters = {
   contract?: ContractType;
   location?: string;
   query?: string;
+  home?: string;
+  distance?: number;
+  remoteToo?: boolean;
+  relocation?: boolean;
   page: number;
 };

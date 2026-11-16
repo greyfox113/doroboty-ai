@@ -8,7 +8,21 @@
       "description": "Polski software house rozwijający produkty automatyzujące pracę zespołów finansowych i operacyjnych. Łączymy badania użytkowników, modele językowe i rygor produkcyjnego oprogramowania.",
       "websiteUrl": "https://example.com/brightlabs",
       "location": "Warszawa",
-      "sizeLabel": "51–200 osób"
+      "sizeLabel": "51–200 osób",
+      "industry": "Oprogramowanie dla finansów i operacji",
+      "address": "Warszawa, Wola, ul. Prosta",
+      "social": ["LinkedIn", "GitHub"],
+      "values": [
+        "Decyzje podejmuje zespół, który zna problem",
+        "Mierzymy, zanim wdrożymy",
+        "Otwarta informacja zwrotna, także dla liderów"
+      ],
+      "benefits": [
+        "Budżet edukacyjny 6 tys. zł rocznie",
+        "Prywatna opieka medyczna",
+        "Sprzęt do wyboru",
+        "Dzień w miesiącu na własny projekt"
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000002",
@@ -18,7 +32,22 @@
       "description": "Europejska firma healthtech upraszczająca dokumentację i koordynację opieki. Pracujemy w środowisku regulowanym, dlatego jakość i możliwość wyjaśnienia decyzji są równie ważne jak tempo.",
       "websiteUrl": "https://example.com/northstar",
       "location": "Kraków / zdalnie",
-      "sizeLabel": "201–500 osób"
+      "sizeLabel": "201–500 osób",
+      "industry": "Oprogramowanie medyczne",
+      "address": "Kraków, Zabłocie, ul. Lipowa (zespół pracuje zdalnie)",
+      "remoteTeam": true,
+      "social": ["LinkedIn", "YouTube"],
+      "values": [
+        "Bezpieczeństwo pacjenta na pierwszym miejscu",
+        "Komunikacja asynchroniczna i dobra dokumentacja",
+        "Decyzje oparte na danych i rozmowach z użytkownikami"
+      ],
+      "benefits": [
+        "Praca w pełni zdalna",
+        "Budżet edukacyjny: konferencje i kursy",
+        "Prywatna opieka medyczna z pakietem badań",
+        "Budżet na biuro domowe"
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000003",
@@ -28,7 +57,21 @@
       "description": "Projektujemy i wdrażamy cyfrowe produkty, które rozwiązują realne problemy biznesowe. AI traktujemy jak materiał projektowy, a nie osobną kategorię produktu.",
       "websiteUrl": "https://example.com/plain-sight",
       "location": "Wrocław",
-      "sizeLabel": "11–50 osób"
+      "sizeLabel": "11–50 osób",
+      "industry": "Studio produktowe B2B",
+      "address": "Wrocław, Krzyki, ul. Powstańców Śląskich",
+      "social": ["LinkedIn", "Instagram"],
+      "values": [
+        "Konkret zamiast prezentacji",
+        "Projektujemy razem z użytkownikami",
+        "Małe kroki i szybka nauka"
+      ],
+      "benefits": [
+        "Budżet edukacyjny 4 tys. zł rocznie",
+        "Prywatna opieka medyczna",
+        "Elastyczne godziny pracy",
+        "Karta sportowa"
+      ]
     }
   ],
   "jobs": [
@@ -57,7 +100,27 @@
       "publicationStatus": "published",
       "publishedAt": "2026-09-28T09:00:00.000Z",
       "expiryAt": "2026-11-30T23:59:59.000Z",
-      "verificationStatus": "employer_verified"
+      "verificationStatus": "employer_verified",
+      "keySkill": "Prowadzenie wdrożeń AI od discovery do wyniku",
+      "mustHave": [
+        "Discovery z użytkownikami i analiza procesów",
+        "Priorytetyzacja roadmapy i prezentowanie jej zarządowi"
+      ],
+      "niceToHave": ["Doświadczenie z produktami dla finansów"],
+      "challenge": "Ustal, które pomysły na automatyzację procesów finansowych naprawdę ułatwią pracę klientom, i poprowadź pierwszy z nich do mierzalnego wdrożenia.",
+      "duties": [
+        "Prowadzenie cross-funkcyjnego zespołu produktowego przez cały cykl życia produktu",
+        "Discovery z użytkownikami: wywiady, obserwacja pracy, dane o czasie obsługi i poprawkach",
+        "Priorytetyzacja roadmapy i prezentowanie jej przed zarządem i klientami",
+        "Definiowanie eksperymentów, kryteriów odbioru i metryk wdrożenia",
+        "Współpraca z designerem, inżynierami i zespołem wdrożeń u klientów"
+      ],
+      "experience": "Min. 4 lata jako Product Manager lub Product Owner, w tym min. jeden produkt poprowadzony od discovery do wdrożenia.",
+      "team": "Designer, 4 inżynierów, 2 osoby od wdrożeń u klientów.",
+      "tools": "Linear, Figma, Metabase, modele językowe przez API",
+      "workStyle": "Model hybrydowy: 2 dni w tygodniu w biurze w Warszawie. O zakresie wdrożenia decyduje zespół razem z klientem.",
+      "relocation": "tak, jednorazowo 5 tys. zł",
+      "responseDays": 4
     },
     {
       "id": "20000000-0000-4000-8000-000000000002",
@@ -84,7 +147,26 @@
       "publicationStatus": "published",
       "publishedAt": "2026-09-25T09:00:00.000Z",
       "expiryAt": "2026-12-15T23:59:59.000Z",
-      "verificationStatus": "editorial"
+      "verificationStatus": "editorial",
+      "keySkill": "Ewaluacja modeli w produkcji",
+      "mustHave": [
+        "Budowanie ewaluacji modeli językowych w produkcji",
+        "Python i projektowanie systemów rozproszonych"
+      ],
+      "niceToHave": ["Doświadczenie w branży medycznej"],
+      "challenge": "Zbuduj wspólną ewaluację i monitoring modeli, dzięki którym zespoły produktowe rozpoznają błędne sugestie przed wdrożeniem i po nim.",
+      "duties": [
+        "Projektowanie wspólnej platformy ewaluacji dla kilku funkcji produktu",
+        "Definiowanie metryk jakości razem z ekspertami domenowymi",
+        "Wdrożenie ewaluacji jako warunku publikacji nowej wersji modelu",
+        "Monitoring jakości po wdrożeniu i analiza regresji",
+        "Mentoring inżynierów i przeglądy architektury"
+      ],
+      "experience": "Min. 7 lat jako inżynier oprogramowania, w tym min. 2 lata przy modelach językowych lub ML w produkcji.",
+      "team": "Zespół platformy: 6 inżynierów, 2 osoby od danych, ekspertka kliniczna.",
+      "tools": "Python, Kubernetes, Postgres, modele językowe hostowane w UE",
+      "workStyle": "Praca w pełni zdalna z Polski. Spotkanie zespołu na żywo raz na kwartał.",
+      "responseDays": 5
     },
     {
       "id": "20000000-0000-4000-8000-000000000003",
@@ -111,7 +193,27 @@
       "publicationStatus": "published",
       "publishedAt": "2026-09-20T09:00:00.000Z",
       "expiryAt": "2026-11-20T23:59:59.000Z",
-      "verificationStatus": "employer_verified"
+      "verificationStatus": "employer_verified",
+      "keySkill": "Projektowanie interfejsów z podpowiedziami AI",
+      "mustHave": [
+        "Badania z użytkownikami i testy prototypów",
+        "Projektowanie interakcji dla niepewnych wyników systemu"
+      ],
+      "niceToHave": ["Doświadczenie w produktach B2B"],
+      "challenge": "Zaprojektuj narzędzie, w którym użytkownik rozumie podpowiedź systemu i sam decyduje, czy z niej skorzystać.",
+      "duties": [
+        "Badanie, kiedy ludzie korzystają z sugestii, poprawiają je albo pracują samodzielnie",
+        "Projektowanie przepływów, prototypów i stanów błędów",
+        "Testy z użytkownikami klienta i analiza wyników",
+        "Współpraca z product managerem i inżynierami przy wdrożeniu",
+        "Prowadzenie przeglądów projektów z innymi designerami"
+      ],
+      "experience": "Min. 5 lat jako Product Designer, w tym projekty oparte na badaniach z użytkownikami.",
+      "team": "Product manager, 3 inżynierów, 2 designerów w studiu.",
+      "tools": "Figma, Maze, Dovetail",
+      "workStyle": "Model hybrydowy: biuro we Wrocławiu lub w Warszawie raz w tygodniu.",
+      "relocation": "nie",
+      "responseDays": 3
     },
     {
       "id": "20000000-0000-4000-8000-000000000004",
@@ -138,7 +240,27 @@
       "publicationStatus": "published",
       "publishedAt": "2026-09-16T09:00:00.000Z",
       "expiryAt": "2026-11-16T23:59:59.000Z",
-      "verificationStatus": "unverified"
+      "verificationStatus": "unverified",
+      "keySkill": "Automatyzacja procesów z modelami językowymi",
+      "mustHave": [
+        "Mapowanie procesów i obsługi wyjątków",
+        "Make, n8n lub podobne narzędzie do automatyzacji"
+      ],
+      "niceToHave": ["Podstawy Pythona"],
+      "challenge": "Zautomatyzuj powtarzalne kroki w finansach i obsłudze klienta tak, żeby zespół nadal kontrolował wyjątki.",
+      "duties": [
+        "Rozpisywanie procesów razem z użytkownikami: kroki, wyjątki, dane i decyzje",
+        "Budowa i utrzymanie małych automatyzacji z modelami językowymi",
+        "Sprawdzanie wyników automatyzacji i ręczna ścieżka obsługi błędów",
+        "Instrukcje, demonstracje i wsparcie zespołu w pierwszych dniach",
+        "Mierzenie oszczędności czasu po wdrożeniu"
+      ],
+      "experience": "Min. 2 lata przy automatyzacji procesów lub w operacjach.",
+      "team": "Zespół finansów i obsługi klienta: 9 osób, wsparcie inżyniera od integracji.",
+      "tools": "Make, n8n, Google Workspace, modele językowe przez API",
+      "workStyle": "Praca stacjonarna w biurze w Warszawie, blisko zespołów, które korzystają z automatyzacji.",
+      "relocation": "nie",
+      "responseDays": 4
     },
     {
       "id": "20000000-0000-4000-8000-000000000005",
@@ -165,7 +287,23 @@
       "publicationStatus": "published",
       "publishedAt": "2026-09-10T09:00:00.000Z",
       "expiryAt": "2026-11-10T23:59:59.000Z",
-      "verificationStatus": "editorial"
+      "verificationStatus": "editorial",
+      "keySkill": "Budowanie powtarzalnej ścieżki sprzedaży B2B",
+      "mustHave": ["Prowadzenie eksperymentów wzrostu w B2B", "Praca z długim procesem zakupowym"],
+      "niceToHave": ["Branża medyczna lub regulowana"],
+      "challenge": "Znajdź powtarzalny sposób docierania do organizacji medycznych, które mają konkretny problem i są gotowe na pilotaż.",
+      "duties": [
+        "Analiza ścieżki zakupu: użytkownik, kupujący i osoba oceniająca ryzyko",
+        "Projektowanie i prowadzenie eksperymentów wzrostu",
+        "Współpraca z produktem, sprzedażą, wdrożeniami i compliance",
+        "Raportowanie wyników i rekomendacje dla zarządu",
+        "Budowa zespołu wzrostu w kolejnym roku"
+      ],
+      "experience": "Min. 6 lat w marketingu lub wzroście produktów B2B, w tym min. 2 lata w roli lidera.",
+      "team": "Na start 2 osoby, współpraca z zespołem sprzedaży (5 osób).",
+      "tools": "HubSpot, Amplitude, Notion",
+      "workStyle": "Praca zdalna w Europie. Spotkania zespołu na żywo raz na kwartał.",
+      "responseDays": 5
     },
     {
       "id": "20000000-0000-4000-8000-000000000006",
@@ -192,7 +330,24 @@
       "publicationStatus": "published",
       "publishedAt": "2026-09-08T09:00:00.000Z",
       "expiryAt": "2026-11-08T23:59:59.000Z",
-      "verificationStatus": "editorial"
+      "verificationStatus": "editorial",
+      "keySkill": "Eksperymenty ML możliwe do powtórzenia",
+      "mustHave": ["Python i biblioteki ML", "Przygotowanie danych i etykiet"],
+      "niceToHave": ["Wyszukiwanie wektorowe"],
+      "challenge": "Wdrażaj małe, dobrze zmierzone funkcje ML w produktach klientów, zaczynając od porządkowania zgłoszeń.",
+      "duties": [
+        "Analiza danych i etykiet przed budową modelu",
+        "Przygotowanie metody porównawczej i eksperymentów do powtórzenia",
+        "Wdrażanie modeli w produktach klientów razem z inżynierami",
+        "Ustalanie z produktem, jak pokazać wynik i co robić przy niepewności",
+        "Dokumentacja i przeglądy z bardziej doświadczonymi osobami"
+      ],
+      "experience": "Min. 2 lata jako ML Engineer, Data Scientist lub backend developer pracujący z ML.",
+      "team": "Mały zespół: 3 inżynierów i osoba prowadząca produkt.",
+      "tools": "Python, scikit-learn, PyTorch, Postgres, pgvector",
+      "workStyle": "Model hybrydowy we Wrocławiu: 2 dni w tygodniu w biurze.",
+      "relocation": "tak, do 6 tys. zł",
+      "responseDays": 3
     }
   ]
 }

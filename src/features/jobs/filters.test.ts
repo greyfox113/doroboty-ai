@@ -53,3 +53,40 @@ describe("job filters", () => {
     expect(hasIndexableFilters({ function: "product", page: 1 })).toBe(true);
   });
 });
+
+describe("distance and relocation filters", () => {
+  it("parses home, distance, remote and relocation parameters", () => {
+    expect(
+      parseJobFilters({ home: "Pruszków", distance: "25", remoteToo: "0", relocation: "1" }),
+    ).toMatchObject({ home: "Pruszków", distance: 25, remoteToo: false, relocation: true });
+    expect(parseJobFilters({ distance: "7" })).toEqual({ page: 1 });
+  });
+
+  it("keeps offices within the radius and remote roles unless excluded", () => {
+    const jobs = joinJobsWithCompanies();
+    const near = filterJobs(jobs, { page: 1, home: "Pruszków", distance: 25 });
+    expect(near.map((x) => x.slug)).toEqual(
+      expect.arrayContaining([
+        "ai-product-manager",
+        "ai-operations-specialist",
+        "staff-ai-engineer",
+      ]),
+    );
+    expect(near.some((x) => x.slug === "machine-learning-engineer")).toBe(false);
+    const officeOnly = filterJobs(jobs, {
+      page: 1,
+      home: "Pruszków",
+      distance: 25,
+      remoteToo: false,
+    });
+    expect(officeOnly.every((x) => x.remoteStatus !== "remote")).toBe(true);
+  });
+
+  it("shows only hybrid or on-site roles with a relocation allowance", () => {
+    const jobs = filterJobs(joinJobsWithCompanies(), { page: 1, relocation: true });
+    expect(jobs.map((x) => x.slug).sort()).toEqual([
+      "ai-product-manager",
+      "machine-learning-engineer",
+    ]);
+  });
+});

@@ -30,9 +30,13 @@ export function jobListingHref(filters: JobFilters, page = 1, view: "list" | "ma
     "seniority",
     "contract",
     "location",
+    "home",
   ] as const) {
     if (filters[key]) query.set(key, filters[key]);
   }
+  if (filters.distance) query.set("distance", String(filters.distance));
+  if (filters.remoteToo === false) query.set("remoteToo", "0");
+  if (filters.relocation) query.set("relocation", "1");
   if (view === "map") query.set("view", "map");
   else if (page > 1) query.set("page", String(page));
   return query.size ? `/oferty?${query}` : "/oferty";

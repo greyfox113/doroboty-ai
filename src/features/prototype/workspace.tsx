@@ -10,7 +10,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { JobCard } from "@/features/jobs/job-card";
 import { ApplicationOfferPreview } from "@/features/jobs/application-offer-preview";
 import { usePrototype } from "./store";
-import { currentPerson, publishedJobs, stageLabels, MIN_APPLICATION_ANSWER_LENGTH } from "./model";
+import {
+  currentPerson,
+  publishedJobs,
+  stageLabels,
+  MIN_APPLICATION_ANSWER_LENGTH,
+  type Person,
+} from "./model";
 import { PageTitle, Empty, NotFound, Notice } from "./shell";
 import { CvAttachment } from "./cv-attachment";
 import { MatchScore } from "./match-score";
@@ -18,6 +24,8 @@ import { RecruitingApplication } from "./recruiting-application";
 import { CandidateApplication } from "./candidate-application";
 import { OwnWorkStep } from "@/features/applications/own-work-step";
 import { answeredExamples, ownWorkPrompts } from "@/features/applications/own-work";
+import { illustrations } from "@/features/public/illustrations";
+import { publicationStatusLabel } from "@/features/jobs/presentation";
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -27,45 +35,126 @@ export function Field({ label, children }: { label: string; children: ReactNode 
     </label>
   );
 }
+const roleGroups = [
+  ["candidate", "Kandydaci i kandydatki"],
+  ["employer", "Firmy"],
+  ["operator", "Prowadzący case study"],
+] as const;
 export function PersonPicker() {
   const { state, run } = usePrototype();
   const navigate = useNavigate();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const next = params.get("next");
   const audience = params.get("audience");
-  const people =
-    audience === "candidate" || audience === "employer"
-      ? state.people.filter((person) => person.role === audience)
-      : state.people;
+  const role = audience === "candidate" || audience === "employer" ? audience : null;
   const safeNext = next && /^\/(?!\/)/.test(next) && !next.startsWith("/auth") ? next : null;
+  function enter(person: Person) {
+    run({ type: "select_person", id: person.id });
+    navigate(
+      person.role === "candidate"
+        ? (safeNext ?? "/app")
+        : person.role === "employer"
+          ? safeNext?.startsWith("/app/oferty") || safeNext === "/app/kandydaci"
+            ? safeNext
+            : "/app/oferty"
+          : "/app/case",
+    );
+  }
   return (
-    <section className="prototype-section max-w-4xl">
-      <h1>Wybierz osobę</h1>
-      <p className="mt-4 mb-8 text-muted-foreground">
-        Wybierz profil, z którego chcesz korzystać w prototypie. Hasło nie jest potrzebne.
-      </p>
-      <div className="grid gap-5 sm:grid-cols-2">
-        {people.map((person) => (
-          <article key={person.id} className="prototype-panel">
-            <h2 className="text-xl">{person.name}</h2>
-            <p className="my-4 text-muted-foreground">{person.headline}</p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                run({ type: "select_person", id: person.id });
-                navigate(
-                  person.role === "candidate"
-                    ? (safeNext ?? "/app")
-                    : person.role === "employer"
-                      ? "/app/oferty"
-                      : "/app/case",
+    <section className="dr-login" data-role={role ?? "all"}>
+      <div className="dr-wrap dr-login-grid">
+        <div className="dr-login-col">
+          <fieldset className="ds-segment">
+            <legend className="sr-only">Logujesz się jako</legend>
+            {(
+              [
+                ["candidate", "Kandydat/kandydatka"],
+                ["employer", "Firma"],
+              ] as const
+            ).map(([value, label]) => (
+              <label key={value}>
+                <input
+                  type="radio"
+                  name="login-role"
+                  value={value}
+                  checked={role === value}
+                  onChange={() => {
+                    const nextParams = new URLSearchParams(params);
+                    nextParams.set("audience", value);
+                    setParams(nextParams, { replace: true });
+                  }}
+                />
+                {label}
+              </label>
+            ))}
+          </fieldset>
+          <div className="ds-card dr-login-card">
+            <h1 className="ds-title dr-login-h">
+              {role === "employer"
+                ? "Wejdź do panelu firmy"
+                : role === "candidate"
+                  ? "Wejdź na konto kandydata"
+                  : "Wybierz osobę"}
+            </h1>
+            <p className="ds-lead">
+              To symulacja logowania: wybierz fikcyjną osobę, z której chcesz korzystać w
+              prototypie. Hasło nie jest potrzebne.
+            </p>
+            {roleGroups
+              .filter(([groupRole]) => !role || groupRole === role)
+              .map(([groupRole, label]) => {
+                const people = state.people.filter((person) => person.role === groupRole);
+                if (!people.length) return null;
+                return (
+                  <div key={groupRole} className="dr-login-group">
+                    {!role && <p className="ds-label">{label}</p>}
+                    <ul className="dr-person-list">
+                      {people.map((person) => (
+                        <li key={person.id} className="ds-panel dr-person">
+                          <div className="min-w-0">
+                            <h2 className="dr-person-name">{person.name}</h2>
+                            <p className="ds-meta">{person.headline}</p>
+                          </div>
+                          <button
+                            type="button"
+                            className="ds-btn ds-btn--primary"
+                            onClick={() => enter(person)}
+                          >
+                            Wejdź jako {person.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 );
-              }}
-            >
-              Wejdź jako {person.name}
-            </Button>
-          </article>
-        ))}
+              })}
+          </div>
+          <p className="ds-meta dr-note">
+            Prawdziwe logowanie (e-mail i hasło) nie jest częścią tego prototypu.
+          </p>
+        </div>
+        <div className="dr-login-ilu">
+          <img
+            src={role === "employer" ? illustrations.specialist : illustrations.blockTower}
+            alt=""
+            data-orientation={role === "employer" ? "portrait" : "panorama"}
+          />
+          <ul className="dr-checks dr-login-points">
+            {role === "employer" ? (
+              <>
+                <li>Twoje ogłoszenia i zgłoszenia w jednym miejscu</li>
+                <li>Filtr „Z przykładami” pokazuje, kto opisał własną pracę</li>
+                <li>Notatka do zgłoszenia zostaje tylko w panelu firmy</li>
+              </>
+            ) : (
+              <>
+                <li>Zapisane oferty i szkice aplikacji</li>
+                <li>Status każdej wysłanej aplikacji</li>
+                <li>Opcjonalny krok „Twoja praca” przy aplikacji</li>
+              </>
+            )}
+          </ul>
+        </div>
       </div>
     </section>
   );
@@ -313,8 +402,15 @@ export function ApplyPage() {
       }
     }
   }
+  const answerOk = answerLength >= MIN_APPLICATION_ANSWER_LENGTH;
+  const currentStep = !answerOk ? 1 : consent || (filledExamples.length > 0 && declared) ? 3 : 2;
+  const steps = [
+    ["krok-1", "Dane i CV", answerOk],
+    ["krok-2", "Twoja praca", filledExamples.length > 0 && declared],
+    ["krok-3", "Sprawdź i wyślij", false],
+  ] as const;
   return (
-    <section className="pp-container application-page">
+    <section className="dr-wrap application-page">
       <BackLink to={`/oferty/${job.slug}`}>Wróć do oferty</BackLink>
       <header className="application-header">
         <h1>Aplikuj na ofertę</h1>
@@ -325,7 +421,7 @@ export function ApplyPage() {
         <form
           noValidate
           onSubmit={submit}
-          className="record-sheet application-form"
+          className="application-form"
           aria-labelledby="application-form-title"
         >
           <header className="application-form-intro">
@@ -334,47 +430,69 @@ export function ApplyPage() {
               Aplikujesz jako <strong>{person.name}</strong>.
             </p>
           </header>
-          <section className="application-form-section" aria-labelledby="application-cv-title">
-            <p className="own-work-step">Krok 1 z 3</p>
-            <h3 id="application-cv-title">Twoje CV</h3>
-            <p className="application-help">Do aplikacji dołączymy CV z Twojego profilu.</p>
-            <CvAttachment
-              candidateId={person.id}
-              fallbackText={person.cv}
-              layout="row"
-              contextLabel="CV z Twojego profilu"
-            />
-          </section>
-          <section
-            className="application-form-section application-answer"
-            aria-label="Odpowiedź do aplikacji"
-          >
-            <Field label="Dlaczego pasujesz do tej roli?">
-              <Textarea
-                disabled={submitted}
-                ref={answerInput}
-                required
-                minLength={MIN_APPLICATION_ANSWER_LENGTH}
-                maxLength={12000}
-                aria-invalid={answerInvalid || undefined}
-                aria-describedby="application-answer-help"
-                value={answer}
-                onChange={(e) => {
-                  setAnswer(e.target.value);
-                  setConsent(false);
-                }}
+          <ol className="ds-stepper dr-stepper" aria-label="Kroki aplikacji">
+            {steps.map(([id, label, done], index) => (
+              <li
+                key={id}
+                aria-current={currentStep === index + 1 ? "step" : undefined}
+                className={done && currentStep !== index + 1 ? "is-done" : undefined}
+              >
+                <a
+                  href={`#${id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(id)?.scrollIntoView({ block: "start" });
+                  }}
+                >
+                  {label}
+                  {index === 1 && <span className="dr-opt"> (opcjonalnie)</span>}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <div id="krok-1" className="ds-card dr-step">
+            <section className="application-form-section" aria-labelledby="application-cv-title">
+              <p className="own-work-step">Krok 1 z 3</p>
+              <h3 id="application-cv-title">Twoje CV</h3>
+              <p className="application-help">Do aplikacji dołączymy CV z Twojego profilu.</p>
+              <CvAttachment
+                candidateId={person.id}
+                fallbackText={person.cv}
+                layout="row"
+                contextLabel="CV z Twojego profilu"
               />
-            </Field>
-            <p
-              id="application-answer-help"
-              role={answerInvalid ? "alert" : undefined}
-              className={answerInvalid ? "error-message" : "text-sm text-muted-foreground"}
+            </section>
+            <section
+              className="application-form-section application-answer"
+              aria-label="Odpowiedź do aplikacji"
             >
-              {answerInvalid
-                ? `Odpowiedź jest za krótka. Wpisz co najmniej ${MIN_APPLICATION_ANSWER_LENGTH} znaków (obecnie: ${answerLength}).`
-                : `Minimum ${MIN_APPLICATION_ANSWER_LENGTH} znaków. Obecnie: ${answerLength}.`}
-            </p>
-          </section>
+              <Field label="Dlaczego pasujesz do tej roli?">
+                <Textarea
+                  disabled={submitted}
+                  ref={answerInput}
+                  required
+                  minLength={MIN_APPLICATION_ANSWER_LENGTH}
+                  maxLength={12000}
+                  aria-invalid={answerInvalid || undefined}
+                  aria-describedby="application-answer-help"
+                  value={answer}
+                  onChange={(e) => {
+                    setAnswer(e.target.value);
+                    setConsent(false);
+                  }}
+                />
+              </Field>
+              <p
+                id="application-answer-help"
+                role={answerInvalid ? "alert" : undefined}
+                className={answerInvalid ? "error-message" : "text-sm text-muted-foreground"}
+              >
+                {answerInvalid
+                  ? `Odpowiedź jest za krótka. Wpisz co najmniej ${MIN_APPLICATION_ANSWER_LENGTH} znaków (obecnie: ${answerLength}).`
+                  : `Minimum ${MIN_APPLICATION_ANSWER_LENGTH} znaków. Obecnie: ${answerLength}.`}
+              </p>
+            </section>
+          </div>
           <OwnWorkStep
             prompts={prompts}
             answers={examples}
@@ -392,7 +510,7 @@ export function ApplyPage() {
             declarationInvalid={declarationInvalid}
             disabled={submitted}
           />
-          <div className="application-form-section application-submit">
+          <div id="krok-3" className="ds-card dr-step application-form-section application-submit">
             <p className="own-work-step">Krok 3 z 3</p>
             <label className="application-consent">
               <Checkbox
@@ -451,54 +569,211 @@ export function ApplyPage() {
     </section>
   );
 }
+type EmployerFilter = "all" | "examples" | "new";
+function EmployerApplications() {
+  const { state } = usePrototype();
+  const person = currentPerson(state)!;
+  const [params, setParams] = useSearchParams();
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<EmployerFilter>("all");
+  const jobs = state.jobs.filter((x) => x.companyId === person.companyId);
+  const companyApps = state.applications.filter((x) => x.companyId === person.companyId);
+  const selectedId = jobs.some((x) => x.id === params.get("oferta")) ? params.get("oferta") : null;
+  const selected = publishedJobs(state).find((x) => x.id === selectedId);
+  const applications = companyApps.filter(
+    (x) =>
+      (!selectedId || x.jobId === selectedId) &&
+      (filter !== "examples" || (x.examples?.length ?? 0) > 0) &&
+      (filter !== "new" || x.stage === "submitted") &&
+      `${x.candidateName} ${x.jobTitle}`
+        .toLocaleLowerCase("pl")
+        .includes(query.toLocaleLowerCase("pl")),
+  );
+  function choose(id: string) {
+    const next = new URLSearchParams(params);
+    if (id) next.set("oferta", id);
+    else next.delete("oferta");
+    setParams(next, { replace: true });
+  }
+  const stats = (jobId?: string) => {
+    const list = companyApps.filter((x) => !jobId || x.jobId === jobId);
+    return {
+      total: list.length,
+      fresh: list.filter((x) => x.stage === "submitted").length,
+      examples: list.filter((x) => (x.examples?.length ?? 0) > 0).length,
+    };
+  };
+  const adButton = (id: string, title: string, meta: ReactNode) => {
+    const counts = stats(id || undefined);
+    return (
+      <li key={id || "all"}>
+        <button
+          type="button"
+          className="dr-ad-item"
+          aria-current={(selectedId ?? "") === id ? "true" : undefined}
+          onClick={() => choose(id)}
+        >
+          <span className="dr-ad-top">{meta}</span>
+          <span className="dr-ad-title">{title}</span>
+          <span className="dr-ad-stats">
+            <span>
+              <b>{counts.total}</b> aplikacji
+            </span>
+            <span>
+              <b>{counts.fresh}</b> nowych
+            </span>
+            <span>
+              <b>{counts.examples}</b> z przykładami
+            </span>
+          </span>
+        </button>
+      </li>
+    );
+  };
+  return (
+    <>
+      <div className="dr-panel-head">
+        <div>
+          <p className="ds-meta">Panel firmy · dane przykładowe</p>
+          <h1 className="ds-title dr-big">Kandydaci</h1>
+        </div>
+        <Link className="ds-btn ds-btn--primary" to="/app/oferty/nowa">
+          Dodaj ogłoszenie
+        </Link>
+      </div>
+      <div className="dr-panel-grid">
+        <section className="dr-panel-ads" aria-labelledby="panel-ads-h">
+          <h2 id="panel-ads-h" className="sr-only">
+            Ogłoszenia
+          </h2>
+          <ul className="dr-ad-list">
+            {adButton(
+              "",
+              "Wszystkie ogłoszenia",
+              <span className="ds-meta">{jobs.length} ogłoszeń</span>,
+            )}
+            {jobs.map((job) =>
+              adButton(
+                job.id,
+                job.title,
+                <span className="ds-tag ds-tag--signal">
+                  {publicationStatusLabel(job.publicationStatus)}
+                </span>,
+              ),
+            )}
+          </ul>
+        </section>
+        <section className="dr-panel-apps" aria-labelledby="panel-apps-h">
+          {selected && (
+            <div className="ds-card dr-ad-summary">
+              <p className="ds-meta">Wybrane ogłoszenie</p>
+              <p className="dr-job-title">{selected.title}</p>
+              {selected.keySkill && (
+                <>
+                  <p className="ds-label">Kluczowa kompetencja</p>
+                  <div className="ds-tile-human dr-key">{selected.keySkill}</div>
+                </>
+              )}
+              <div className="ds-btn-group">
+                <Link className="ds-btn ds-btn--secondary" to={`/app/oferty/${selected.id}`}>
+                  Edytuj ogłoszenie
+                </Link>
+                <Link className="ds-btn ds-btn--secondary" to={`/oferty/${selected.slug}`}>
+                  Zobacz publiczną stronę
+                </Link>
+              </div>
+            </div>
+          )}
+          <div className="dr-apps-bar">
+            <h2 id="panel-apps-h" className="ds-title">
+              Aplikacje
+            </h2>
+            <fieldset className="ds-segment own-work-filter">
+              <legend className="sr-only">Pokaż aplikacje</legend>
+              {(
+                [
+                  ["all", "Wszystkie"],
+                  ["examples", "Z przykładami"],
+                  ["new", "Nowe"],
+                ] as const
+              ).map(([value, label]) => (
+                <label key={value}>
+                  <input
+                    type="radio"
+                    name="own-work-filter"
+                    checked={filter === value}
+                    onChange={() => setFilter(value)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </fieldset>
+          </div>
+          <Field label="Szukaj kandydata lub oferty">
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} />
+          </Field>
+          <p className="ds-meta" aria-live="polite">
+            Pokazujemy {applications.length} z {companyApps.length}
+          </p>
+          <div className="dr-apps">
+            {applications.length ? (
+              applications.map((a) => (
+                <article className="ds-card dr-app" key={a.id}>
+                  <div className="dr-app-top">
+                    <div className="min-w-0">
+                      <p className="ds-meta">{a.jobTitle}</p>
+                      <h3 className="dr-job-title">
+                        <Link to={`/app/kandydaci/${a.id}`}>{a.candidateName}</Link>
+                      </h3>
+                    </div>
+                    <MatchScore score={a.score} />
+                  </div>
+                  <span className="ds-tag ds-tag--signal">{stageLabels[a.stage]}</span>
+                  {(a.examples?.length ?? 0) > 0 && (
+                    <p className="own-work-signal">
+                      Przykłady pracy: {a.examples!.length}
+                      {a.declaredOwnWork ? " · deklaruje: bez AI" : ""}
+                    </p>
+                  )}
+                  <p className="dr-body">{a.summary}</p>
+                </article>
+              ))
+            ) : (
+              <div className="ds-card dr-empty">
+                <img src={illustrations.wave} alt="" />
+                <p>Brak aplikacji spełniających kryteria.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
 export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
   const { state } = usePrototype();
   const person = currentPerson(state)!;
   const [query, setQuery] = useState("");
-  const [withExamples, setWithExamples] = useState(false);
   const [params] = useSearchParams();
+  if (employer) return <EmployerApplications />;
   const applications = state.applications.filter(
     (x) =>
-      (employer ? x.companyId === person.companyId : x.candidateId === person.id) &&
-      (!employer || !withExamples || (x.examples?.length ?? 0) > 0) &&
+      x.candidateId === person.id &&
       `${x.candidateName} ${x.jobTitle}`
         .toLocaleLowerCase("pl")
         .includes(query.toLocaleLowerCase("pl")),
   );
   return (
     <>
-      <PageTitle>{employer ? "Kandydaci" : "Moje aplikacje"}</PageTitle>
+      <PageTitle>Moje aplikacje</PageTitle>
       {params.has("wyslano") && (
         <Notice>
           <CheckCircle2 className="inline size-5" /> Aplikacja została wysłana.
         </Notice>
       )}
-      <Field label={employer ? "Szukaj kandydata lub oferty" : "Szukaj oferty"}>
+      <Field label="Szukaj oferty">
         <Input value={query} onChange={(e) => setQuery(e.target.value)} />
       </Field>
-      {employer && (
-        <fieldset className="own-work-filter">
-          <legend className="sr-only">Pokaż aplikacje</legend>
-          <label>
-            <input
-              type="radio"
-              name="own-work-filter"
-              checked={!withExamples}
-              onChange={() => setWithExamples(false)}
-            />{" "}
-            Wszystkie
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="own-work-filter"
-              checked={withExamples}
-              onChange={() => setWithExamples(true)}
-            />{" "}
-            Z przykładami
-          </label>
-        </fieldset>
-      )}
       <div className="mt-6 space-y-4">
         {applications.length ? (
           applications.map((a) => (
@@ -507,26 +782,17 @@ export function ApplicationsPage({ employer = false }: { employer?: boolean }) {
                 <div>
                   <Link
                     className="text-xl font-semibold text-[var(--gui-link)]"
-                    to={`${employer ? "/app/kandydaci" : "/app/aplikacje"}/${a.id}`}
+                    to={`/app/aplikacje/${a.id}`}
                   >
-                    {employer ? a.candidateName : a.jobTitle}
+                    {a.jobTitle}
                   </Link>
                   <p className="my-3 text-muted-foreground">
-                    {employer
-                      ? a.jobTitle
-                      : state.companies.find((x) => x.id === a.companyId)?.name}
+                    {state.companies.find((x) => x.id === a.companyId)?.name}
                   </p>
-                  <p>{stageLabels[a.stage]}</p>
-                  {employer && (a.examples?.length ?? 0) > 0 && (
-                    <p className="own-work-signal">
-                      Przykłady pracy: {a.examples!.length}
-                      {a.declaredOwnWork ? " · deklaruje: bez AI" : ""}
-                    </p>
-                  )}
+                  <span className="ds-tag ds-tag--signal">{stageLabels[a.stage]}</span>
                 </div>
                 <MatchScore score={a.score} />
               </div>
-              {employer && <p className="mt-4 text-muted-foreground">{a.summary}</p>}
             </article>
           ))
         ) : (

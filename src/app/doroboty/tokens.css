@@ -1,0 +1,62 @@
+/* Copied from doroboty-discovery/design-system/tokens.css (13.11.2026). Only change: --ds-font and --ds-control-font point to the bundled local Inter Variable. */
+/* DoRoboty.ai — tokeny design systemu (prototypy ze sprintu discovery).
+   Stan: 13.11.2026.
+   Kierunek (decyzja Agaty 12.11.2026): układ i komponenty K3, kolorystyka K2, ilustracje,
+   przyciski i kafelek „Ty” z K1.
+   Źródła: pomiary ze stron referencyjnych (moodboard v2) i paleta zmierzona z pikseli ilustracji. */
+:root {
+  /* — powierzchnie (K2: ciepła baza; krem z ilustracji, żeby pliki nie miały krawędzi) — */
+  --ds-bg: #f7edda; /* krem ilustracji (zmierzone z pikseli, ~58% powierzchni) */
+  --ds-bg-ilu-02: #faebd6; /* tło ilu-02 (zmierzone z pikseli) */
+  --ds-bg-ilu-04: #f8e9d2; /* tło ilu-04 (zmierzone z pikseli) */
+  --ds-bg-ilu-08: #f7f0e0; /* tło ilu-08 (zmierzone z pikseli) */
+  --ds-bg-ilu-09: #f4eddb; /* tło ilu-09 i ilu-01 (zmierzone z pikseli) */
+  --ds-bg-ilu-03: #f8efde; /* tło ilu-03 (zmierzone z pikseli) */
+  --ds-bg-ilu-10: #faf4e8; /* tło ilu-10 (zmierzone z pikseli) */
+  --ds-bg-ilu-warm: #f8e8cf; /* tło ilu-06 (zmierzone z pikseli); sekcje z tą ilustracją, żeby nie było widać krawędzi */
+  --ds-surface: #fffdf8; /* karta: ciepła biel (propozycja) */
+  --ds-surface-2: #fbf5ea; /* panel w karcie: siatka faktów, zapisane do ogłoszenia (propozycja) */
+  --ds-line: #e6dac4; /* linie i obrysy kart (propozycja, z kremu); NIE na obrysy pól */
+  --ds-line-control: #958773; /* obrys pól formularza: 3,51:1 na białym, WCAG 1.4.11 (decyzja Agaty 13.11.2026) */
+
+  /* — tekst (K2: czerń; granat z ilustracji w nagłówkach) — */
+  --ds-ink: #1d1d1d; /* tekst (K2 / Modern Life: tekst prawie czarny) */
+  --ds-ink-heading: #192f52; /* nagłówki: granat ilustracji (zmierzone z pikseli) */
+  --ds-ink-muted: #5e5a52; /* tekst pomocniczy, ciepła szarość (propozycja) */
+
+  /* — kolor mocny: główne działanie i słowa człowieka (z K1) — */
+  --ds-ink-strong: #110f15; /* Back Market: kolor nagłówków (zmierzone) */
+  --ds-on-strong: #ffffff;
+
+  /* — akcenty z ilustracji — */
+  --ds-accent: #1e5f67; /* morski: etykiety, linki nawigacji (zmierzone z pikseli) */
+  --ds-accent-tint: #ddedec; /* tło tagów sygnałów (propozycja, rozjaśniony morski) */
+  --ds-accent-2: #4eabbf; /* turkus: elementy dekoracyjne, wykresy (zmierzone z pikseli) */
+  --ds-must-tint: #e3e8f1; /* tło tagu „Konieczne” (propozycja, rozjaśniony granat) */
+  --ds-danger: #d54441; /* czerwień ilustracji: obrysy błędów i ostrzeżeń (zmierzone z pikseli); nie na tekst */
+  --ds-danger-text: #b8322f; /* tekst błędów: 5,84:1 na karcie, 5,11:1 na kremie, WCAG 1.4.3 (decyzja Agaty 13.11.2026) */
+
+  /* — stany przycisków (decyzja Agaty 13.11.2026: „na hover state użyj color/text/heading jako koloru button z elewacją. użyj ciemno zielonego koloru z design systemu na click”) — */
+  --ds-btn-hover: var(--ds-ink-heading); /* najechanie: granat #192F52 (biały tekst 13,38:1) */
+  --ds-btn-active: var(--ds-accent); /* kliknięcie: ciemna zieleń #1E5F67 (biały tekst 7,27:1) */
+  --ds-elev-hover:
+    0 4px 10px rgba(25, 47, 82, 0.22), 0 1px 2px rgba(25, 47, 82, 0.18); /* elewacja przy najechaniu */
+
+  /* — kształt i rozmiar kontrolek — */
+  --ds-radius-control: 6px; /* Back Market: pola i przyciski (zmierzone) */
+  --ds-radius-card: 8px; /* karta K3, nieco miękcej niż chrono 4 px (propozycja) */
+  --ds-radius-tile: 12px; /* kafelek „Ty” ze szkicu K1 (propozycja) */
+  --ds-border-control: 1px; /* Wellfound Save: obrys 1 px (zmierzone) */
+  --ds-control-h: 40px; /* propozycja; na ekranach dotykowych 44px */
+  --ds-control-pad-x: 16px; /* Wellfound: padding 8/16 (zmierzone) */
+  --ds-control-font: 600 14px/20px "Inter Variable", Inter, system-ui, sans-serif;
+
+  /* — typografia — */
+  --ds-font: "Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* — odstępy — */
+  --ds-space-actions: 24px; /* od tekstu do grupy przycisków (decyzja Agaty 12.11.2026) */
+
+  /* — fokus — */
+  --ds-focus: #2c75b1; /* niebieski z palety ilustracji (zmierzone z pikseli) */
+}

@@ -9,10 +9,10 @@
   --icon-regular-display: inline;
   --icon-bold-display: none;
 
-  --gui-font-brand: "Geist Serif", Georgia, serif;
-  --gui-font-ui: Arial, Helvetica, system-ui, sans-serif;
-  --gui-font-editorial: "Geist Serif", Georgia, serif;
-  --gui-font-data: Arial, Helvetica, system-ui, sans-serif;
+  --gui-font-brand: "Inter Variable", Inter, system-ui, sans-serif;
+  --gui-font-ui: "Inter Variable", Inter, system-ui, sans-serif;
+  --gui-font-editorial: "Inter Variable", Inter, system-ui, sans-serif;
+  --gui-font-data: "Inter Variable", Inter, system-ui, sans-serif;
   --font-ui: var(--gui-font-ui);
   --font-brand: var(--gui-font-brand);
   --font-editorial: var(--gui-font-editorial);
@@ -97,25 +97,21 @@
   --gui-neutral-9: #333333;
   --gui-neutral-9-transparent: #33333333;
   --gui-neutral-10: #181818;
-  --gui-color-1: #ff90e8;
+  --gui-color-1: #ddedec;
   --gui-color-2: #181818;
   --gui-color-2-transparent: #085e5533;
-  --gui-color-3: #ffe45b;
-  --gui-color-3-transparent: #ffed9b33;
-  --gui-color-4: #ffb5aa;
-  --gui-color-4-transparent: #ffb5aa33;
+  --gui-color-3: #e3e8f1;
+  --gui-color-3-transparent: #e3e8f133;
+  --gui-color-4: #f8e8cf;
+  --gui-color-4-transparent: #f8e8cf33;
   /* Noninteractive Match Score facts: red → orange → yellow → vivid green. */
-  --gui-match-red: #ff6b79;
-  --gui-match-orange: #ffb15c;
-  --gui-match-yellow: #ffe45b;
-  --gui-match-green: #00c853;
   --gui-success: #00906c;
   --gui-warning: #ffea00;
   --gui-warning-transparent: #ffea0033;
   --gui-error: #fc032d;
   --gui-neutral-10-transparent: #00000033;
   --gui-backdrop: #18181899;
-  --gui-color-1-transparent: #ffe0f7;
+  --gui-color-1-transparent: #eef6f5;
   --gui-success-transparent: #00906c33;
   --gui-error-transparent: #fc032d33;
 
@@ -128,7 +124,7 @@
   --gui-edge: #181818;
   --gui-accent: var(--gui-color-1);
   --gui-accent-text: #181818;
-  /* Dark labels on pink actions. */
+  /* Labels on primary actions. */
   --gui-accent-text-accessible: var(--gui-neutral-10);
   --gui-danger: var(--gui-error);
   --gui-focus: #181818;
@@ -250,8 +246,8 @@
   --card-foreground: var(--gui-text);
   --popover: var(--gui-neutral-1);
   --popover-foreground: var(--gui-text);
-  --primary: #ff90e8;
-  --primary-foreground: #181818;
+  --primary: #110f15;
+  --primary-foreground: #ffffff;
   --secondary: var(--gui-surface-muted);
   --secondary-foreground: var(--gui-text);
   --muted: var(--gui-surface-muted);

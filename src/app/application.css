@@ -51,7 +51,7 @@
   width: 44px;
   height: 44px;
   border: 1px solid var(--gui-edge);
-  border-radius: 10px;
+  border-radius: var(--ds-radius-control);
 }
 .application-offer h2 {
   font-size: 28px;
@@ -74,11 +74,11 @@
 .application-pay {
   margin-top: 22px;
 }
-.application-pay .pp-salary-tag {
+.application-pay .salary-amount {
   font-size: 20px;
   line-height: 1.4;
 }
-.application-pay .pp-salary-description {
+.application-pay .salary-basis {
   font-size: 12px;
   margin-top: 8px;
 }
@@ -87,7 +87,7 @@
   gap: 14px;
   padding-block: 22px;
   margin-top: 22px;
-  border-block: 1px solid var(--pp-line);
+  border-block: 1px solid var(--ds-line);
   font-size: 13px;
 }
 .application-offer-facts > div {
@@ -167,7 +167,7 @@
   overflow-wrap: anywhere;
 }
 .application-form-section {
-  border-top: 1px solid var(--pp-line);
+  border-top: 1px solid var(--ds-line);
   padding-block: 24px;
 }
 .application-form-section h3 {
@@ -236,7 +236,7 @@
     gap: 24px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
   }
-  .application-pay .pp-salary-tag {
+  .application-pay .salary-amount {
     font-size: 18px;
   }
 }
@@ -269,7 +269,7 @@
   .application-offer h2 {
     font-size: 26px;
   }
-  .application-pay .pp-salary-tag {
+  .application-pay .salary-amount {
     font-size: 20px;
   }
   .application-form-intro {
