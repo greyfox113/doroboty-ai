@@ -19,6 +19,7 @@ import { illustrations } from "@/features/public/illustrations";
 import { currentPerson } from "./model";
 import { usePrototype } from "./store";
 import { AccountMenu } from "./account-menu";
+import { NO_CAPTURE, trackPageview } from "@/lib/analytics";
 const navigation: { to: { pathname: string; hash?: string }; label: string }[] = [
   { to: { pathname: "/oferty" }, label: "Oferty" },
   { to: { pathname: "/", hash: "#jak-aplikowac" }, label: "Jak aplikować" },
@@ -71,9 +72,14 @@ export function Shell() {
   const person = currentPerson(state);
   const { pathname } = useLocation();
   const workspace = pathname.startsWith("/app") && person;
+  // Workspace, application form and settings hold personal text: Autocapture ignores them.
+  const privateArea = pathname.startsWith("/app") || pathname.startsWith("/aplikuj");
   const [menuAt, setMenuAt] = useState<string | null>(null);
   const main = useRef<HTMLElement>(null);
   const lastPath = useRef(pathname);
+  useEffect(() => {
+    trackPageview();
+  }, [pathname]);
   useEffect(() => {
     if (lastPath.current !== pathname) {
       clearError();
@@ -141,7 +147,7 @@ export function Shell() {
             </Button>
           </div>
           <aside
-            className={`sidebar ${menuAt === pathname ? "sidebar-open" : ""}`}
+            className={`${NO_CAPTURE} sidebar ${menuAt === pathname ? "sidebar-open" : ""}`}
             onKeyDown={(e) => {
               if (e.key === "Escape") setMenuAt(null);
             }}
@@ -197,7 +203,12 @@ export function Shell() {
               </span>
               <Link to="/auth/sign-in">{person.name}</Link>
             </div>
-            <main id="main" ref={main} tabIndex={-1} className="main-content outline-none">
+            <main
+              id="main"
+              ref={main}
+              tabIndex={-1}
+              className={`main-content outline-none ${NO_CAPTURE}`}
+            >
               {content}
             </main>
           </div>
@@ -239,7 +250,12 @@ export function Shell() {
               </nav>
             </div>
           </header>
-          <main id="main" ref={main} tabIndex={-1} className="outline-none">
+          <main
+            id="main"
+            ref={main}
+            tabIndex={-1}
+            className={privateArea ? `outline-none ${NO_CAPTURE}` : "outline-none"}
+          >
             {content}
           </main>
           <img className="dr-foot-wave" src={illustrations.ribbon} alt="" />

@@ -125,8 +125,13 @@ export function PrivacyPage() {
         </p>
         <p>
           Profile, aplikacje i ustawienia pozostają w pamięci tej przeglądarki. Aplikacja nie wysyła
-          ich do bazy, dostawcy AI ani systemu analitycznego. Plik eksportu zawiera cały lokalny
-          scenariusz, w tym notatki.
+          ich do bazy ani dostawcy AI. Plik eksportu zawiera cały lokalny scenariusz, w tym notatki.
+        </p>
+        <p>
+          Opublikowana wersja korzysta z PostHoga (serwery w USA) do statystyk: zapisuje wejścia na
+          strony i kliknięcia na stronach publicznych, np. na liście ofert. Nie zapisuje tego, co
+          wpisujesz, ani zdarzeń z formularza aplikacji, panelu konta i ustawień. Nie używa plików
+          cookie ani nagrywania sesji; każda wizyta jest anonimowa.
         </p>
         <p>
           Możesz usunąć zmiany przyciskiem „Resetuj scenariusz” w ustawieniach lub wyczyścić dane
