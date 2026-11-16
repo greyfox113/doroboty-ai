@@ -23,7 +23,7 @@ const items: Record<Person["role"], [string, string][]> = {
 export function AccountMenu({ person }: { person: Person }) {
   return (
     <Menu.Root>
-      <Menu.Trigger className="dr-account" aria-label={`Menu konta: ${person.name}`}>
+      <Menu.Trigger className="dr-account ph-no-capture" aria-label={`Menu konta: ${person.name}`}>
         <span className="dr-account-avatar" aria-hidden="true">
           {person.name[0]}
         </span>
@@ -32,7 +32,7 @@ export function AccountMenu({ person }: { person: Person }) {
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner className="dr-account-positioner" align="end" sideOffset={6}>
-          <Menu.Popup className="dr-account-popup">
+          <Menu.Popup className="dr-account-popup ph-no-capture">
             <div className="dr-account-who" aria-hidden="true">
               <strong>{person.name}</strong>
               <span>{person.headline}</span>
