@@ -1539,3 +1539,94 @@ body {
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   line-height: 1.15;
 }
+
+/* Account menu (signed-in): personal pages such as "Moje aplikacje" live under the profile. */
+.dr-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--ds-line-control);
+  border-radius: var(--ds-radius-control);
+  background: var(--ds-surface);
+  color: var(--ds-ink-heading);
+  font: 600 14px var(--ds-font);
+  cursor: pointer;
+}
+.dr-account:hover,
+.dr-account[data-popup-open] {
+  border-color: var(--ds-ink-heading);
+}
+.dr-account:focus-visible {
+  outline: 3px solid var(--ds-focus);
+  outline-offset: 2px;
+}
+.dr-account-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ds-radius-control);
+  background: var(--ds-accent-tint);
+  color: var(--ds-accent);
+  font-weight: 700;
+}
+.dr-account-name {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .dr-account-name {
+    display: none;
+  }
+}
+.dr-account-positioner {
+  z-index: 40;
+}
+.dr-account-popup {
+  min-width: 240px;
+  padding: 6px;
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+  box-shadow: 0 8px 24px rgba(25, 47, 82, 0.14);
+  font-family: var(--ds-font);
+  outline: none;
+}
+.dr-account-who {
+  display: grid;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--ds-line);
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--ds-ink-muted);
+}
+.dr-account-who strong {
+  font-size: 14px;
+  color: var(--ds-ink-heading);
+}
+.dr-account-item {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: var(--ds-radius-control);
+  color: var(--ds-ink);
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+}
+.dr-account-item[data-highlighted] {
+  background: var(--ds-accent-tint);
+  color: var(--ds-accent);
+}
+.dr-account-sep {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--ds-line);
+}

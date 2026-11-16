@@ -3,7 +3,6 @@ import { Link, NavLink, Outlet, useLocation } from "react-router";
 import {
   Menu,
   ArrowUpRight,
-  LogOut,
   X,
   BriefcaseBusiness,
   UserRound,
@@ -19,6 +18,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { illustrations } from "@/features/public/illustrations";
 import { currentPerson } from "./model";
 import { usePrototype } from "./store";
+import { AccountMenu } from "./account-menu";
 const navigation: { to: { pathname: string; hash?: string }; label: string }[] = [
   { to: { pathname: "/oferty" }, label: "Oferty" },
   { to: { pathname: "/", hash: "#jak-aplikowac" }, label: "Jak aplikować" },
@@ -221,26 +221,10 @@ export function Shell() {
                       {item.label}
                     </NavLink>
                   ))}
-                  {person?.role === "candidate" && (
-                    <>
-                      <Link to="/app/aplikacje">Aplikacje</Link>
-                      <Link to="/app/profil">Profil</Link>
-                    </>
-                  )}
                 </div>
                 {person ? (
                   <div className="dr-head-actions">
-                    <Link to="/app" className="ds-btn ds-btn--secondary">
-                      Moje konto
-                    </Link>
-                    <Link
-                      className="dr-head-icon"
-                      to="/auth/sign-in"
-                      aria-label="Zmień osobę"
-                      title="Zmień osobę"
-                    >
-                      <LogOut aria-hidden="true" />
-                    </Link>
+                    <AccountMenu person={person} />
                   </div>
                 ) : (
                   <div className="dr-head-actions">

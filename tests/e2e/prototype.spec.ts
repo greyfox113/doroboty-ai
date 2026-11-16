@@ -506,8 +506,20 @@ test("DoRoboty offer page keeps the summary beside the segments and before them 
   );
   await expect(summary.getByRole("link", { name: "Aplikuj", exact: true })).toBeVisible();
   const nav = page.getByRole("navigation", { name: "Główna nawigacja" });
-  await expect(nav.getByRole("link", { name: "Aplikacje", exact: true })).toBeVisible();
-  await expect(nav.getByRole("link", { name: "Profil", exact: true })).toBeVisible();
+  // Personal pages are only in the signed-in account menu, not in the main navigation.
+  await expect(nav.getByRole("link", { name: /Aplikacje|Profil/ })).toHaveCount(0);
+  const account = nav.getByRole("button", { name: "Menu konta: Anna Kowalska" });
+  await account.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menuitem")).toHaveText([
+    "Mój profil",
+    "Moje aplikacje",
+    "Zapisane oferty",
+    "Przegląd konta",
+    "Zmień osobę",
+  ]);
+  await page.keyboard.press("Escape");
+  await expect(account).toBeFocused();
   await page.screenshot({ path: "artifacts/offer-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -751,6 +763,25 @@ test("public DoRoboty pages: hero, for companies, terms and sign-in simulation",
   await expect(page).toHaveURL(/audience=employer/);
   await page.getByRole("button", { name: "Wejdź jako Karolina Wiśniewska", exact: true }).click();
   await expect(page).toHaveURL(/#\/app\/oferty$/);
+});
+
+test("Moje aplikacje is reachable only from the signed-in account menu", async ({ page }) => {
+  await page.goto("/#/oferty");
+  const nav = page.getByRole("navigation", { name: "Główna nawigacja" });
+  await expect(nav.getByRole("button", { name: /Menu konta/ })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: /aplikacje/i })).toHaveCount(0);
+  await page.goto("/#/app/aplikacje");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wybierz osobę");
+  await page.getByRole("button", { name: "Wejdź jako Anna Kowalska", exact: true }).click();
+  await page.goto("/#/oferty");
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 800 });
+    await nav.getByRole("button", { name: "Menu konta: Anna Kowalska" }).click();
+    await page.getByRole("menuitem", { name: "Moje aplikacje" }).click();
+    await expect(page).toHaveURL(/#\/app\/aplikacje$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Moje aplikacje");
+    await page.goto("/#/oferty");
+  }
 });
 
 test("employer panel lists the company's ads and filters applications per ad", async ({ page }) => {

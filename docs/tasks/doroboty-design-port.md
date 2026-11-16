@@ -39,6 +39,8 @@ AGENTS.md and CLAUDE.md require Poster People for every new or changed screen. T
 - The listing keeps the existing map view, pagination and removable filter chips; there is no sort control.
 - Match Score: one turquoise label (`--ds-accent-2`) for every value instead of colour bands (owner request 16.11.2026: "tło label powinno być z design systemu - turkus").
 
+- Account menu (owner request 16.11.2026: "podstrona aplikacje/moje aplikacje powinna być dostępna tylko dla zalogowanych, w menu pod ich profilem"): personal pages moved from the public navigation into a menu under the signed-in person's name.
+
 ## Validation
 
 Executed on 16.11.2026 (Intel macOS, Node 24.22.3):
