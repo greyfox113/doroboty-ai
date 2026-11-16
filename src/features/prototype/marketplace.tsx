@@ -33,6 +33,7 @@ import {
 import type { JobFilters, JobWithCompany } from "@/features/jobs/types";
 import { illustrationAlt, illustrations } from "@/features/public/illustrations";
 import { useSectionHash } from "./home";
+import posthog from "posthog-js";
 import { usePrototype } from "./store";
 import { currentPerson, publishedJobs } from "./model";
 import { NotFound } from "./shell";
@@ -337,7 +338,13 @@ function OfferActions({ job }: { job: JobWithCompany }) {
           className="ds-btn ds-btn--secondary dr-save"
           aria-label="Zapisz ofertę"
           aria-pressed={saved}
-          onClick={() => run({ type: "toggle_saved", jobId: job.id })}
+          onClick={() => {
+            if (run({ type: "toggle_saved", jobId: job.id }) && posthog.__loaded)
+              posthog.capture(saved ? "job_unsaved" : "job_saved", {
+                job_id: job.id,
+                job_category: job.category,
+              });
+          }}
         >
           {saved ? "Zapisano" : "Zapisz"}
         </button>

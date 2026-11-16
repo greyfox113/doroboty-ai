@@ -26,6 +26,7 @@ import { OwnWorkStep } from "@/features/applications/own-work-step";
 import { answeredExamples, ownWorkPrompts } from "@/features/applications/own-work";
 import { illustrations } from "@/features/public/illustrations";
 import { publicationStatusLabel } from "@/features/jobs/presentation";
+import posthog from "posthog-js";
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -49,7 +50,8 @@ export function PersonPicker() {
   const role = audience === "candidate" || audience === "employer" ? audience : null;
   const safeNext = next && /^\/(?!\/)/.test(next) && !next.startsWith("/auth") ? next : null;
   function enter(person: Person) {
-    run({ type: "select_person", id: person.id });
+    if (run({ type: "select_person", id: person.id }) && posthog.__loaded)
+      posthog.capture("account_selected", { role: person.role });
     navigate(
       person.role === "candidate"
         ? (safeNext ?? "/app")
@@ -247,8 +249,10 @@ export function ProfilePage({ preview = false }: { preview?: boolean }) {
           location: String(data.get("location")),
         },
       })
-    )
+    ) {
+      if (posthog.__loaded) posthog.capture("profile_saved");
       setMessage("Profil został zapisany.");
+    }
   }
   return (
     <>
@@ -393,6 +397,14 @@ export function ApplyPage() {
         declaredOwnWork: filledExamples.length > 0 && declared,
       })
     ) {
+      if (posthog.__loaded)
+        posthog.capture("application_submitted", {
+          job_id: job!.id,
+          job_category: job!.category,
+          answer_length: answerLength,
+          own_work_example_count: filledExamples.length,
+          used_generated_content: Boolean(generated),
+        });
       submittedOnce.current = true;
       setSubmitted(true);
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -546,8 +558,16 @@ export function ApplyPage() {
                 disabled={submitted}
                 variant="outline"
                 onClick={() => {
-                  if (run({ type: "draft", jobId: job.id, notes, generated, answer, examples }))
+                  if (run({ type: "draft", jobId: job.id, notes, generated, answer, examples })) {
+                    if (posthog.__loaded)
+                      posthog.capture("application_draft_saved", {
+                        job_id: job.id,
+                        answer_length: answerLength,
+                        own_work_example_count: filledExamples.length,
+                        used_generated_content: Boolean(generated),
+                      });
                     setMessage("Szkic został zapisany.");
+                  }
                 }}
               >
                 Zapisz szkic

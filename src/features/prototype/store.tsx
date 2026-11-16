@@ -1,5 +1,14 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { initialState, transition, type Action, type State } from "./model";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import posthog from "posthog-js";
+import { currentPerson, initialState, transition, type Action, type State } from "./model";
 import { parseState, readState, saveState, type StoragePort } from "./storage";
 function browserStorage(): StoragePort | null {
   try {
@@ -15,6 +24,29 @@ function useStore() {
   const [error, setError] = useState("");
   const [blocked, setBlocked] = useState(loaded.blocked);
   const latest = useRef(state);
+  const identifiedPersonId = useRef<string | null>(null);
+
+  const synchronizeIdentity = useCallback((previous: State, next: State) => {
+    if (!posthog.__loaded) return;
+
+    try {
+      const previousPerson = currentPerson(previous);
+      const nextPerson = currentPerson(next);
+      if (previousPerson?.id !== nextPerson?.id && previousPerson) posthog.reset();
+      if (nextPerson && identifiedPersonId.current !== nextPerson.id) {
+        posthog.identify(nextPerson.id, {
+          name: nextPerson.name,
+          role: nextPerson.role,
+          ...(nextPerson.companyId ? { company_id: nextPerson.companyId } : {}),
+        });
+        identifiedPersonId.current = nextPerson.id;
+      }
+      if (!nextPerson) identifiedPersonId.current = null;
+    } catch {
+      // Analytics must not interrupt the prototype's own state transitions.
+    }
+  }, []);
+
   function commit(next: State, replace = false) {
     latest.current = next;
     setState(next);
@@ -26,11 +58,15 @@ function useStore() {
       if (replace) setBlocked(false);
     } catch (e) {
       setIssue((e as Error).message);
+      if (posthog.__loaded)
+        posthog.logger.warn("prototype state persistence failed", { operation: "save_state" });
     }
   }
   function run(action: Action) {
     try {
-      commit(transition(latest.current, action));
+      const next = transition(latest.current, action);
+      synchronizeIdentity(latest.current, next);
+      commit(next);
       return true;
     } catch (e) {
       setError(
@@ -38,12 +74,15 @@ function useStore() {
           ? e.message
           : "Sprawdź poprawność i długość wprowadzonych danych.",
       );
+      if (posthog.__loaded)
+        posthog.logger.warn("prototype state transition rejected", { action_type: action.type });
       return false;
     }
   }
   function importState(raw: string) {
     try {
       const next = parseState(raw);
+      synchronizeIdentity(latest.current, next);
       commit(next, true);
       return true;
     } catch (e) {
@@ -53,7 +92,8 @@ function useStore() {
   }
   useEffect(() => {
     document.documentElement.classList.remove("dark");
-  }, []);
+    synchronizeIdentity(initialState(), latest.current);
+  }, [synchronizeIdentity]);
   return {
     state,
     issue,
@@ -63,7 +103,11 @@ function useStore() {
     run,
     importState,
     clearError: () => setError(""),
-    reset: () => commit(initialState(), true),
+    reset: () => {
+      const next = initialState();
+      synchronizeIdentity(latest.current, next);
+      commit(next, true);
+    },
   };
 }
 type Store = ReturnType<typeof useStore>;
