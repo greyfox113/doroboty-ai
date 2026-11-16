@@ -9,29 +9,8 @@
  * the primary action, sea green for links and signals, red only for errors.
  */
 :root {
-  /* DoRoboty source tokens (names kept from the discovery design system) */
-  --ds-bg: #f7edda;
-  --ds-surface: #fffdf8;
-  --ds-surface-2: #fbf5ea;
-  --ds-line: #e6dac4;
-  --ds-line-control: #958773;
-  --ds-ink: #1d1d1d;
-  --ds-ink-heading: #192f52;
-  --ds-ink-muted: #5e5a52;
-  --ds-ink-strong: #110f15;
-  --ds-on-strong: #ffffff;
-  --ds-accent: #1e5f67;
-  --ds-accent-tint: #ddedec;
-  --ds-accent-2: #4eabbf;
-  --ds-must-tint: #e3e8f1;
-  --ds-danger: #d54441;
-  --ds-danger-text: #b8322f;
-  --ds-focus: #2c75b1;
-  --ds-radius-control: 6px;
-  --ds-radius-card: 8px;
-  --ds-radius-tile: 12px;
+  /* DoRoboty source tokens come from ./doroboty/tokens.css (copied design system). */
   --ds-shadow-card: 0 4px 14px rgba(25, 47, 82, 0.06);
-  --ds-font: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* Host typography: one typeface (Inter), no serif display */
   --gui-font-brand: var(--ds-font);
@@ -88,18 +67,6 @@
   --destructive: var(--ds-danger-text);
   --border: var(--ds-line);
   --ring: var(--ds-focus);
-
-  /* Poster People marketplace namespace */
-  --pp-paper: var(--ds-bg);
-  --pp-surface: var(--ds-surface);
-  --pp-ink: var(--ds-ink);
-  --pp-muted: var(--ds-ink-muted);
-  --pp-line: var(--ds-line);
-  --pp-action: var(--ds-accent-2);
-  --pp-action-hover: var(--ds-accent-tint);
-  --pp-fact: var(--ds-surface-2);
-  --pp-yellow: var(--ds-must-tint);
-  --pp-surface-hover: #fffaf0;
 }
 
 body {
@@ -108,7 +75,7 @@ body {
   color: var(--ds-ink);
 }
 
-/* Headings: navy, bold Inter, tight tracking (replaces Geist Serif 400) */
+/* Headings: navy, bold Inter, tight tracking */
 h1,
 h2,
 h3,
@@ -173,8 +140,7 @@ header a[aria-label="DoRoboty.ai — strona główna"],
 nav[aria-label="Główna nawigacja"] a {
   white-space: nowrap;
 }
-/* Tablet: the bold Inter wordmark is wider than Geist Serif, so tighten the bar
-   to keep "Zmień osobę" on screen at 768–1023px. */
+/* Tablet: tighten the bar so all header actions stay on screen at 768–1023px. */
 @media (max-width: 1023px) {
   header:has([aria-label="Główna nawigacja"]) > div {
     padding-inline: 20px;
@@ -250,25 +216,6 @@ textarea {
 input[aria-invalid="true"],
 textarea[aria-invalid="true"] {
   box-shadow: inset 0 0 0 2px var(--ds-danger);
-}
-
-/* Marketplace: search submit is the primary action (black), selected tab black */
-.pp-search-submit {
-  background: var(--ds-ink-strong);
-  color: var(--ds-on-strong);
-  border-color: var(--ds-ink-strong);
-  border-radius: var(--ds-radius-control);
-  --control-hover-bg: var(--gui-neutral-9);
-  --control-hover-text: var(--ds-on-strong);
-}
-.pp-category-tab.pp-selected {
-  background: var(--ds-ink-strong);
-}
-.pp-category-tab.pp-selected small {
-  color: #e9e4da;
-}
-.pp-job-topline .pp-separator {
-  color: var(--ds-ink-muted);
 }
 
 /* Own-work examples (E1): application step, recruiter record and list filter */
@@ -427,8 +374,7 @@ textarea[aria-invalid="true"] {
   --ds-btn-active: var(--ds-accent);
   --ds-elev-hover: 0 4px 10px rgba(25, 47, 82, 0.22), 0 1px 2px rgba(25, 47, 82, 0.18);
 }
-[data-slot="button"],
-.pp-search-submit {
+[data-slot="button"] {
   transition:
     background-color 120ms ease,
     color 120ms ease,
@@ -439,8 +385,7 @@ textarea[aria-invalid="true"] {
     :disabled,
     [aria-disabled="true"],
     [data-disabled]
-  ):hover,
-.pp-search-submit:hover {
+  ):hover:hover {
   background: var(--ds-btn-hover);
   border-color: var(--ds-btn-hover);
   color: var(--ds-on-strong);
@@ -451,8 +396,7 @@ textarea[aria-invalid="true"] {
     :disabled,
     [aria-disabled="true"],
     [data-disabled]
-  ):active,
-.pp-search-submit:active {
+  ):active:active {
   background: var(--ds-btn-active);
   border-color: var(--ds-btn-active);
   color: var(--ds-on-strong);
@@ -481,8 +425,7 @@ textarea[aria-invalid="true"] {
   transform: none;
 }
 @media (hover: none) {
-  [data-slot="button"]:hover,
-  .pp-search-submit:hover {
+  [data-slot="button"]:hover {
     box-shadow: none;
     transform: none;
   }
@@ -491,14 +434,11 @@ textarea[aria-invalid="true"] {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-slot="button"],
-  .pp-search-submit {
+  [data-slot="button"] {
     transition: none;
   }
   [data-slot="button"]:hover,
-  [data-slot="button"]:active,
-  .pp-search-submit:hover,
-  .pp-search-submit:active {
+  [data-slot="button"]:active {
     transform: none;
   }
 }

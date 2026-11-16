@@ -1,0 +1,185 @@
+/* Shared host recipes (layout of workspace screens) in the DoRoboty design system.
+   Replaces the former Poster People adaptation: one typeface (Inter), K3 cards with
+   --ds-line borders and 8px radii, no black outlines, no pink fills. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+[data-slot="dialog-title"],
+[data-slot="alert-dialog-title"] {
+  font-family: var(--ds-font);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--ds-focus);
+  outline-offset: 2px;
+}
+.brand {
+  font-family: var(--ds-font);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.prototype-section {
+  max-width: 1200px;
+  padding-block: 40px;
+}
+.prototype-panel,
+.metric-card,
+.visitors-card,
+.success-panel {
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-surface);
+}
+.prototype-panel h2 {
+  margin-bottom: 12px;
+}
+.prototype-form {
+  padding: 24px;
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+  width: 100%;
+}
+.prototype-panel .prototype-form {
+  padding: 0;
+  border: 0;
+}
+.field {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.field > span:first-child {
+  font-weight: 600;
+  color: var(--ds-ink-heading);
+}
+.prototype-notice {
+  line-height: 1.6;
+}
+.workspace-label {
+  padding-block: 24px;
+}
+.workspace-avatar {
+  flex-shrink: 0;
+}
+.main-content {
+  padding: 32px 40px;
+}
+.topbar {
+  min-height: 64px;
+}
+.page-heading {
+  padding-block: 8px 20px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.native-select {
+  border: 1px solid var(--ds-line-control);
+}
+[data-slot="badge"] {
+  white-space: normal;
+}
+@media (max-width: 600px) {
+  .main-content {
+    padding: 24px 16px;
+  }
+  .prototype-section {
+    padding-inline: 16px;
+  }
+  .prototype-form {
+    padding: 16px;
+  }
+}
+/* Host score facts share one readable treatment across lists and detail views. */
+.match-score {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 3px 12px;
+  border-radius: 3px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+/* One DoRoboty turquoise label for every score (owner request 16.11.2026:
+   "tło label powinno być z design systemu - turkus"). Ink on --ds-accent-2 is about 7:1. */
+.match-score {
+  background: var(--ds-accent-2);
+  color: var(--ds-ink-strong);
+}
+
+/* C13 context returns share one anatomy across public and workspace screens. */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  max-width: 100%;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--gui-text);
+}
+.back-link svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke-width: 1.65;
+}
+.back-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 700px) {
+  .back-link {
+    font-size: 12px;
+  }
+}
+
+/* A brief decorative host extension; the portal never intercepts input or adds overflow. */
+.confetti-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti-burst span {
+  position: absolute;
+  width: 6px;
+  height: 10px;
+  border-radius: 1px;
+  animation: confetti-burst 850ms ease-out both;
+}
+.confetti-burst span:nth-child(3n) {
+  width: 7px;
+  height: 7px;
+}
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  55% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--confetti-peak-x)), calc(-50% + var(--confetti-y)))
+      rotate(var(--confetti-rotation));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--confetti-x)), calc(-50% + var(--confetti-fall-y)))
+      rotate(var(--confetti-rotation));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-burst {
+    display: none;
+  }
+}

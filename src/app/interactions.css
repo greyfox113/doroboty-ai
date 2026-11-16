@@ -32,7 +32,7 @@
 }
 
 /* Selected navigation stays visibly selected during hover. */
-:where(.nav-active, .pp-category-tab.pp-selected, .pp-view-link[aria-current="page"]) {
+:where(.nav-active) {
   --control-hover-bg: var(--gui-neutral-9);
   --control-hover-text: white;
 }

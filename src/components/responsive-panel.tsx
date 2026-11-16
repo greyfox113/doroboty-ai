@@ -35,12 +35,12 @@ export function ResponsivePanel({
   if (!mobile) return children;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="outline" className="pp-filter-button" />}>
-        <SlidersHorizontal className="pp-icon" />
+      <DialogTrigger render={<Button variant="outline" className="dr-filter-button" />}>
+        <SlidersHorizontal className="size-4" />
         {title}
       </DialogTrigger>
-      <DialogContent className="pp-filter-dialog pp-dialog" showCloseButton={false}>
-        <div className="pp-dialog-heading">
+      <DialogContent className="dr-filter-dialog" showCloseButton={false}>
+        <div className="dr-dialog-heading">
           <DialogTitle>{title}</DialogTitle>
           <DialogClose
             render={<Button variant="outline" size="icon-sm" aria-label="Zamknij filtry" />}
@@ -48,9 +48,9 @@ export function ResponsivePanel({
             ×
           </DialogClose>
         </div>
-        <DialogDescription className="pp-filter-help">{description}</DialogDescription>
-        <div className="pp-filter-scroll">{children}</div>
-        <div className="pp-filter-dialog-footer">
+        <DialogDescription className="dr-filter-help">{description}</DialogDescription>
+        <div className="dr-filter-scroll">{children}</div>
+        <div className="dr-filter-dialog-footer">
           <DialogClose render={<Button />}>Pokaż {resultCount} ofert</DialogClose>
         </div>
       </DialogContent>

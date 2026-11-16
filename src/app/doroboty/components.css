@@ -1,0 +1,506 @@
+/* Copied from doroboty-discovery/design-system/components.css (13.11.2026) without changes. Page layout lives in pages.css. */
+/* DoRoboty.ai — komponenty design systemu. Wymaga tokens.css.
+   Układ i komponenty z K3, kolory z K2 i ilustracji, przyciski i kafelek „Ty” z K1. */
+
+/* Ekran */
+.ds-screen {
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  font: 14px/1.5 var(--ds-font);
+  padding: 20px;
+}
+.ds-screen h2,
+.ds-title {
+  font: 700 22px/1.2 var(--ds-font);
+  color: var(--ds-ink-heading);
+  margin: 6px 0 0;
+}
+.ds-meta {
+  font-size: 12px;
+  color: var(--ds-ink-muted);
+}
+.ds-lead {
+  font-size: 13.5px;
+  color: var(--ds-ink-muted);
+  margin: 8px 0 0;
+}
+.ds-label {
+  font: 700 11.5px/1.3 var(--ds-font);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ds-ink-heading);
+  margin: 16px 0 6px;
+}
+
+/* Ilustracja w nagłówku ekranu (zasady: design-system/ilustracje.md) */
+.ds-hero-ilu {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  object-position: right center;
+  background: var(--ds-bg);
+  margin: -4px 0 8px;
+}
+.ds-hero-ilu--wide {
+  object-position: center;
+  height: 90px;
+}
+
+/* Karta i panel (K3) */
+.ds-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+  padding: 16px;
+  margin-top: 12px;
+  box-shadow: 0 4px 14px rgba(25, 47, 82, 0.06);
+}
+.ds-panel {
+  background: var(--ds-surface-2);
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-card);
+  padding: 12px;
+  margin-top: 12px;
+}
+
+/* Siatka faktów etykieta–wartość (K3, Wellfound) */
+.ds-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px 16px;
+  font-size: 13px;
+}
+.ds-facts dt {
+  color: var(--ds-ink-muted);
+  font-size: 11.5px;
+}
+.ds-facts dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ds-ink-heading);
+}
+.ds-facts div {
+  min-width: 0;
+}
+
+/* Tagi (K3) */
+.ds-tag {
+  display: inline-block;
+  font: 600 11px/1.4 var(--ds-font);
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin: 4px 4px 0 0;
+  white-space: nowrap;
+}
+.ds-tag--signal {
+  background: var(--ds-accent-tint);
+  color: var(--ds-accent);
+}
+.ds-tag--must {
+  background: var(--ds-must-tint);
+  color: var(--ds-ink-heading);
+}
+.ds-tag--nice {
+  background: transparent;
+  color: var(--ds-ink-muted);
+  border: 1px dashed var(--ds-line);
+}
+.ds-tag--optional {
+  background: var(--ds-ink-heading);
+  color: #fff;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Pole tekstowe i oświadczenie */
+.ds-field {
+  display: block;
+  width: 100%;
+  min-height: 64px;
+  background: #fff;
+  border: 1px solid var(--ds-line-control);
+  border-radius: var(--ds-radius-control);
+  padding: 10px 12px;
+  font: 13px/1.4 var(--ds-font);
+  color: var(--ds-ink-muted);
+  margin: 8px 0;
+}
+.ds-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+.ds-check i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--ds-ink-heading);
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+/* Rozmowa z asystentem (K3 + kafelek „Ty” z K1) */
+.ds-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.ds-who {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.ds-msg-ai .ds-who {
+  color: var(--ds-accent);
+}
+.ds-msg-human {
+  align-self: flex-end;
+  max-width: 88%;
+}
+.ds-msg-human .ds-who {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+/* Wymagania z priorytetem */
+.ds-req {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 3px 0;
+  font-size: 13px;
+}
+.ds-req .ds-tag {
+  margin: 0;
+  flex: none;
+}
+
+/* Przycisk — z K1 (decyzja Agaty 12.11.2026) */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--ds-control-h);
+  padding: 0 var(--ds-control-pad-x);
+  font: var(--ds-control-font);
+  text-decoration: none;
+  white-space: nowrap;
+  border: var(--ds-border-control) solid var(--ds-ink-strong);
+  border-radius: var(--ds-radius-control);
+  cursor: pointer;
+}
+.ds-btn--primary {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+}
+.ds-btn--secondary {
+  background: var(--ds-surface);
+  color: var(--ds-ink-strong);
+}
+/* Stany (decyzja Agaty 13.11.2026): najechanie = granat nagłówków + elewacja; kliknięcie = ciemna zieleń */
+.ds-btn {
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease,
+    transform 0.08s ease;
+}
+.ds-btn--primary:hover {
+  background: var(--ds-btn-hover);
+  border-color: var(--ds-btn-hover);
+  box-shadow: var(--ds-elev-hover);
+  transform: translateY(-1px);
+}
+.ds-btn--primary:active {
+  background: var(--ds-btn-active);
+  border-color: var(--ds-btn-active);
+  box-shadow: none;
+  transform: none;
+}
+.ds-btn--secondary:hover {
+  color: var(--ds-btn-hover);
+  border-color: var(--ds-btn-hover);
+  box-shadow: var(--ds-elev-hover);
+  transform: translateY(-1px);
+}
+.ds-btn--secondary:active {
+  color: var(--ds-btn-active);
+  border-color: var(--ds-btn-active);
+  background: var(--ds-accent-tint);
+  box-shadow: none;
+  transform: none;
+}
+.ds-btn:disabled:hover,
+.ds-btn[aria-disabled="true"]:hover {
+  box-shadow: none;
+  transform: none;
+}
+.ds-btn--primary:disabled:hover,
+.ds-btn--primary[aria-disabled="true"]:hover {
+  background: var(--ds-ink-strong);
+  border-color: var(--ds-ink-strong);
+}
+.ds-btn--secondary:disabled:hover,
+.ds-btn--secondary[aria-disabled="true"]:hover {
+  color: var(--ds-ink-strong);
+  border-color: var(--ds-ink-strong);
+}
+@media (hover: none) {
+  .ds-btn:hover {
+    box-shadow: none;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-btn {
+    transition: none;
+  }
+  .ds-btn:hover,
+  .ds-btn:active {
+    transform: none;
+  }
+}
+.ds-btn:focus-visible {
+  outline: 3px solid var(--ds-focus);
+  outline-offset: 2px;
+}
+.ds-btn:disabled,
+.ds-btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+@media (pointer: coarse) {
+  .ds-btn {
+    min-height: 44px;
+  }
+}
+
+/* Grupa przycisków: primary pierwszy, secondary obok; zawija się na wąskim ekranie */
+.ds-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--ds-space-actions);
+}
+
+/* Kafelek „słowa człowieka” — z K1 (decyzja Agaty 12.11.2026, wywiad E2) */
+.ds-tile-human {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+  border-radius: var(--ds-radius-tile);
+  padding: 9px 11px;
+}
+
+/* ——— Propozycje 12.11.2026 (formularz aplikacji, aplikuj.html) — do akceptacji ——— */
+
+/* Pole jednowierszowe (input, select, plik) — ta sama skóra co .ds-field */
+.ds-input {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  background: #fff;
+  border: 1px solid var(--ds-line-control);
+  border-radius: var(--ds-radius-control);
+  padding: 0 12px;
+  font: 15px/1.4 var(--ds-font);
+  color: var(--ds-ink);
+}
+textarea.ds-field {
+  color: var(--ds-ink);
+  font-size: 15px;
+  resize: vertical;
+  min-height: 140px;
+}
+.ds-input:focus-visible,
+textarea.ds-field:focus-visible {
+  outline: 3px solid var(--ds-focus);
+  outline-offset: 1px;
+  border-color: var(--ds-focus);
+}
+.ds-field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ds-ink-heading);
+  margin: 16px 0 6px;
+}
+.ds-field-label .ds-meta {
+  font-weight: 400;
+}
+.ds-hint {
+  font-size: 12.5px;
+  color: var(--ds-ink-muted);
+  margin: 4px 0 0;
+}
+
+/* Błąd pola: czerwień tylko dla błędów */
+.ds-error {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-danger-text);
+  margin: 6px 0 0;
+}
+[aria-invalid="true"] {
+  border-color: var(--ds-danger) !important;
+}
+.ds-error-summary {
+  border: 2px solid var(--ds-danger);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-surface);
+  padding: 12px 16px;
+  margin: 12px 0 0;
+}
+.ds-error-summary h2 {
+  font: 700 15px/1.3 var(--ds-font);
+  color: var(--ds-danger-text);
+  margin: 0 0 6px;
+}
+.ds-error-summary ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+}
+.ds-error-summary a {
+  color: var(--ds-danger-text);
+}
+
+/* Kroki procesu (stepper) */
+.ds-stepper {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: s;
+}
+.ds-stepper li {
+  flex: 1 1 0;
+  min-width: 0;
+  counter-increment: s;
+  font-size: 13px;
+  color: var(--ds-ink-muted);
+  border-top: 3px solid var(--ds-line);
+  padding-top: 8px;
+}
+.ds-stepper li::before {
+  content: counter(s) ". ";
+  font-weight: 700;
+}
+.ds-stepper li[aria-current="step"] {
+  color: var(--ds-ink-heading);
+  font-weight: 700;
+  border-top-color: var(--ds-ink-heading);
+}
+.ds-stepper li.is-done {
+  color: var(--ds-accent);
+  border-top-color: var(--ds-accent);
+}
+
+/* Oznaczenie, czy w polu działa asystent pisania */
+.ds-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 11.5px/1.4 var(--ds-font);
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.ds-ai--on {
+  background: var(--ds-accent-tint);
+  color: var(--ds-accent);
+}
+.ds-ai--off {
+  background: var(--ds-surface-2);
+  color: var(--ds-ink-heading);
+  border: 1px solid var(--ds-line);
+}
+.ds-ai--spell {
+  background: var(--ds-surface-2);
+  color: var(--ds-ink-heading);
+  border: 1px solid var(--ds-line);
+}
+.ds-ai--spell::before {
+  content: "Aa";
+  font-size: 10px;
+  font-weight: 800;
+  text-decoration: underline wavy var(--ds-accent);
+}
+.ds-ai--off::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background: linear-gradient(
+    135deg,
+    transparent 45%,
+    currentColor 45%,
+    currentColor 58%,
+    transparent 58%
+  );
+}
+
+/* Przełącznik segmentowy (np. kandydat / firma) — propozycja 12.11.2026, logowanie.html.
+   Radio w etykietach: działa klawiaturą (strzałki), czytnik ekranu ogłasza wybór. */
+.ds-segment {
+  display: inline-flex;
+  border: 1px solid var(--ds-ink-strong);
+  border-radius: var(--ds-radius-control);
+  padding: 3px;
+  gap: 3px;
+  margin: 0;
+  background: var(--ds-surface);
+}
+.ds-segment label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font: var(--ds-control-font);
+  color: var(--ds-ink-strong);
+  cursor: pointer;
+}
+.ds-segment input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.ds-segment label:has(input:checked) {
+  background: var(--ds-ink-strong);
+  color: var(--ds-on-strong);
+}
+.ds-segment label:has(input:focus-visible) {
+  outline: 3px solid var(--ds-focus);
+  outline-offset: 2px;
+}
+
+/* Okno pełnoekranowe (opis oferty „Czytaj więcej”) — propozycja 12.11.2026.
+   <dialog> z showModal(): fokus w środku, Esc zamyka, tło strony nieaktywne. */
+.ds-dialog {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  overflow-y: auto;
+}
+.ds-dialog::backdrop {
+  background: rgba(17, 15, 21, 0.45);
+}

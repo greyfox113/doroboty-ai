@@ -9,6 +9,7 @@ import {
   placesLabel,
   type OwnWorkPrompt,
 } from "./own-work";
+import { illustrations } from "@/features/public/illustrations";
 
 /** Step 2 of the application: optional own-work examples written without AI. */
 export function OwnWorkStep({
@@ -37,8 +38,14 @@ export function OwnWorkStep({
     setBefore((list) => Object.assign([...list], { [index]: value }));
 
   return (
-    <section className="application-form-section own-work" aria-labelledby="own-work-title">
-      <p className="own-work-step">Krok 2 z 3 · opcjonalnie</p>
+    <section
+      id="krok-2"
+      className="ds-card dr-step application-form-section own-work"
+      aria-labelledby="own-work-title"
+    >
+      <img className="dr-card-cover" src={illustrations.handsHorizontal} alt="" />
+      <p className="own-work-step">Krok 2 z 3</p>
+      <span className="ds-tag ds-tag--optional">Opcjonalne</span>
       <h3 id="own-work-title">Twoja praca</h3>
       <p className="application-help">
         Opisz konkretny, ostatni przykład z kompetencji, których potrzebuje ta rola. Pisz własnymi

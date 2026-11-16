@@ -24,6 +24,13 @@ const companySchema = z.object({
     .string()
     .regex(/^\/(?!\/)/)
     .optional(),
+  // DoRoboty offer segments (optional so earlier saved scenarios still parse).
+  industry: shortText.optional(),
+  address: shortText.optional(),
+  remoteTeam: z.boolean().optional(),
+  values: z.array(shortText).max(10).optional(),
+  benefits: z.array(shortText).max(20).optional(),
+  social: z.array(shortText).max(10).optional(),
 });
 export const jobSchema = z
   .object({
@@ -53,6 +60,18 @@ export const jobSchema = z
     verificationStatus: z.enum(["unverified", "editorial", "employer_verified"]),
     sourceBrief: text.optional(),
     generatedDescription: text.optional(),
+    // DoRoboty K3 card and offer segments (optional so earlier saved scenarios still parse).
+    keySkill: shortText.optional(),
+    mustHave: z.array(shortText).max(10).optional(),
+    niceToHave: z.array(shortText).max(10).optional(),
+    challenge: text.optional(),
+    duties: z.array(shortText).max(20).optional(),
+    experience: text.optional(),
+    team: text.optional(),
+    tools: text.optional(),
+    workStyle: text.optional(),
+    relocation: shortText.optional(),
+    responseDays: z.number().int().min(1).max(60).optional(),
   })
   .refine(
     (job) =>
@@ -266,10 +285,52 @@ export function initialState(): State {
   });
   return stateSchema.parse(state);
 }
+const seedJobs = new Map(marketplace.jobs.map((x) => [x.id, x]));
+const seedCompanies = new Map(marketplace.companies.map((x) => [x.id, x]));
+const jobDetailKeys = [
+  "keySkill",
+  "mustHave",
+  "niceToHave",
+  "challenge",
+  "duties",
+  "experience",
+  "team",
+  "tools",
+  "workStyle",
+  "relocation",
+  "responseDays",
+] as const;
+const companyDetailKeys = [
+  "industry",
+  "address",
+  "remoteTeam",
+  "values",
+  "benefits",
+  "social",
+] as const;
+/** Fills optional offer segments missing from an older saved scenario with the seed data of the same record. */
+function withSeedDetails<T extends object>(
+  item: T,
+  seed: object | undefined,
+  keys: readonly string[],
+): T {
+  if (!seed) return item;
+  const filled = { ...item } as Record<string, unknown>;
+  for (const key of keys)
+    if (filled[key] === undefined && key in seed)
+      filled[key] = (seed as Record<string, unknown>)[key];
+  return filled as T;
+}
 export function publishedJobs(state: State): JobWithCompany[] {
   return state.jobs
     .filter((x) => x.publicationStatus === "published")
-    .map((job) => ({ ...job, company: state.companies.find((x) => x.id === job.companyId)! }))
+    .map((job) => {
+      const company = state.companies.find((x) => x.id === job.companyId)!;
+      return {
+        ...withSeedDetails(job, seedJobs.get(job.id), jobDetailKeys),
+        company: withSeedDetails(company, seedCompanies.get(company.id), companyDetailKeys),
+      };
+    })
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 export function currentPerson(state: State) {

@@ -306,7 +306,7 @@ test("core screens have no serious accessibility violations", async ({ page }) =
 test("public home and filters reflow at 320px with no external requests", async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 900 });
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Praca dla ludzi");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Wiesz, czego szukają.");
   await page.screenshot({ path: "artifacts/home-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto("/#/oferty");
@@ -473,47 +473,64 @@ test("legacy dark preference keeps scenario data and renders the light interface
   ).toBeUndefined();
 });
 
-test("Poster People offer keeps desktop conditions/actions and places them before mobile reading", async ({
+test("DoRoboty offer page keeps the summary beside the segments and before them on mobile", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await choose(page, "Anna Kowalska");
   await page.goto("/#/oferty/ai-product-manager");
-  const article = page.locator(".pp-offer-page");
-  const hero = article.locator("header");
-  await expect(hero).toContainText(
-    "Poprowadź produkt od problemu operacyjnego do mierzalnego wdrożenia AI.",
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("AI Product Manager");
+  await expect(page.locator("main")).toContainText("Prowadzenie wdrożeń AI od discovery do wyniku");
+  for (const heading of [
+    "O roli",
+    "Wymagania",
+    "Proces rekrutacji",
+    "Benefity",
+    "O firmie BrightLabs",
+    "Jak aplikujesz na tę ofertę",
+    "Podobne oferty",
+  ])
+    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+  await expect(page.locator("#proces ol > li")).toHaveCount(6);
+  await expect(page.locator("#benefity")).toContainText("Budżet edukacyjny");
+  await expect(page.locator("#firma")).toContainText("Kultura i wartości");
+  await expect(page.getByRole("link", { name: "Zobacz na mapie" })).toHaveAttribute(
+    "href",
+    /openstreetmap\.org/,
   );
-  await expect(hero.getByText("Senior", { exact: true })).toBeVisible();
-  const facts = article.getByRole("complementary");
-  await expect(facts.getByRole("heading", { name: "Konkrety", exact: true })).toHaveCount(1);
-  await expect(facts).toContainText("Wynagrodzenie");
-  const description = article.locator("[data-job-description]");
-  const heroBox = await hero.boundingBox();
-  const descriptionBox = await description.boundingBox();
-  const factsBox = await facts.boundingBox();
-  expect(heroBox!.width).toBeLessThanOrEqual(1024);
-  expect(factsBox!.x).toBeGreaterThan(descriptionBox!.x + descriptionBox!.width);
-  const apply = article.getByRole("link", { name: "Aplikuj", exact: true });
-  const applyBox = await apply.boundingBox();
-  expect(applyBox!.x).toBeGreaterThan(descriptionBox!.x + descriptionBox!.width);
-  await page.screenshot({ path: "artifacts/original-job-layout-desktop.png", fullPage: true });
+  await expect(page.locator("#o-roli")).toContainText("Doświadczenie na podobnym stanowisku");
+  const summary = page.getByRole("complementary", { name: "Podsumowanie oferty" });
+  const role = page.locator("#o-roli");
+  expect((await summary.boundingBox())!.x).toBeGreaterThan(
+    (await role.boundingBox())!.x + (await role.boundingBox())!.width,
+  );
+  await expect(summary.getByRole("link", { name: "Aplikuj", exact: true })).toBeVisible();
   const nav = page.getByRole("navigation", { name: "Główna nawigacja" });
-  await expect(nav.getByRole("link", { name: "Aplikacje", exact: true })).toBeVisible();
-  await expect(nav.getByRole("link", { name: "Profil", exact: true })).toBeVisible();
-  await page.setViewportSize({ width: 375, height: 812 });
+  // Personal pages are only in the signed-in account menu, not in the main navigation.
+  await expect(nav.getByRole("link", { name: /Aplikacje|Profil/ })).toHaveCount(0);
+  const account = nav.getByRole("button", { name: "Menu konta: Anna Kowalska" });
+  await account.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menuitem")).toHaveText([
+    "Mój profil",
+    "Moje aplikacje",
+    "Zapisane oferty",
+    "Przegląd konta",
+    "Zmień osobę",
+  ]);
+  await page.keyboard.press("Escape");
+  await expect(account).toBeFocused();
+  await page.screenshot({ path: "artifacts/offer-desktop.png", fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  expect((await facts.boundingBox())!.y).toBeLessThan((await description.boundingBox())!.y);
-  await page.screenshot({ path: "artifacts/original-job-layout-mobile.png", fullPage: true });
+  expect((await summary.boundingBox())!.y).toBeLessThan((await role.boundingBox())!.y);
+  await page.screenshot({ path: "artifacts/offer-mobile.png", fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await nav.getByRole("link", { name: "Dla firm", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Karolina Wiśniewska", exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Anna Kowalska", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Opowiedz o roli");
 });
 
-test("restored company and public navigation keep their structure across screen sizes", async ({
+test("company profile and public navigation keep their structure across screen sizes", async ({
   page,
 }) => {
   await choose(page, "Anna Kowalska");
@@ -525,7 +542,6 @@ test("restored company and public navigation keep their structure across screen 
     "href",
     "https://example.com/brightlabs",
   );
-  await page.screenshot({ path: "artifacts/original-company-layout-desktop.png", fullPage: true });
   for (const width of [320, 640, 768, 1024]) {
     await page.setViewportSize({ width, height: 900 });
     const nav = await page.getByRole("navigation", { name: "Główna nawigacja" }).boundingBox();
@@ -536,16 +552,15 @@ test("restored company and public navigation keep their structure across screen 
   }
   await page.goto("/#/oferty");
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Dobra robota.");
-  await expect(page.getByRole("textbox", { name: "Szukaj ofert", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Oferty pracy z AI");
+  await expect(page.getByRole("searchbox", { name: "Szukaj ofert", exact: true })).toBeVisible();
   await expect(page.locator("[data-job-page-summary]")).toHaveText("Oferty 1–6 z 6");
-  await page.screenshot({ path: "artifacts/original-list-layout-desktop.png", fullPage: true });
 });
 
 test("mobile search stays visible and filter dialog restores focus", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#/oferty");
-  const input = page.getByRole("textbox", { name: "Szukaj ofert", exact: true });
+  const input = page.getByRole("searchbox", { name: "Szukaj ofert", exact: true });
   await expect(input).toBeVisible();
   await input.fill("Product");
   await page.getByRole("button", { name: "Szukaj", exact: true }).click();
@@ -561,7 +576,7 @@ test("mobile search stays visible and filter dialog restores focus", async ({ pa
   await trigger.click();
   await dialog.getByRole("button", { name: /Pokaż \d+ ofert/ }).click();
   await expect(trigger).toBeFocused();
-  await page.getByRole("button", { name: "Wyczyść", exact: true }).click();
+  await page.getByRole("button", { name: "Wyczyść wszystko", exact: true }).click();
   await expect(input).toHaveValue("");
   await expect(page).toHaveURL(/#\/oferty$/);
   await page.goBack();
@@ -570,49 +585,103 @@ test("mobile search stays visible and filter dialog restores focus", async ({ pa
 
 test("desktop reset synchronizes search, category and facets with the URL", async ({ page }) => {
   await page.goto("/#/oferty");
-  const input = page.getByRole("textbox", { name: "Szukaj ofert", exact: true });
+  const input = page.getByRole("searchbox", { name: "Szukaj ofert", exact: true });
   await input.fill("Product");
   await page.getByRole("button", { name: "Szukaj", exact: true }).click();
   await page.getByRole("checkbox", { name: "Zdalnie", exact: true }).click();
+  await page.getByRole("checkbox", { name: /prowadzisz inicjatywy AI/ }).click();
   await expect(page.getByRole("checkbox", { name: "Zdalnie", exact: true })).toBeChecked();
-  await page.getByRole("button", { name: "Wyczyść", exact: true }).first().click();
+  await page.getByRole("button", { name: "Wyczyść", exact: true }).click();
   await expect(input).toHaveValue("");
   await expect(page.getByRole("checkbox", { name: "Zdalnie", exact: true })).not.toBeChecked();
-  await expect(page.getByRole("button", { name: /Wszystkie oferty/ })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
+  await expect(page.getByRole("checkbox", { name: /prowadzisz inicjatywy AI/ })).not.toBeChecked();
+  await expect(page).toHaveURL(/#\/oferty$/);
 });
 
-test("canonical marketplace typography and search geometry match Poster People breakpoints", async ({
+test("distance from home and relocation filters narrow the list and stay in the URL", async ({
   page,
 }) => {
-  for (const [width, title, card] of [
-    [1280, "72px", "28px"],
-    [1100, "58px", "26px"],
-    [850, "52px", "28px"],
-    [390, "43px", "26px"],
-  ] as const) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/#/oferty");
-    await expect(page.locator(".pp-intro-copy h1")).toHaveCSS("font-size", title);
-    await expect(page.locator(".pp-job-title").first()).toHaveCSS("font-size", card);
-    await expect(page.getByRole("textbox", { name: "Szukaj ofert", exact: true })).toBeVisible();
-    if (width === 1280) {
-      expect((await page.locator(".pp-search-form").boundingBox())!.width).toBe(1200);
-      await expect(page.locator(".pp-salary-tag").first()).toHaveCSS("font-size", "15px");
-    }
+  await page.goto("/#/oferty");
+  await page.getByLabel("Gdzie mieszkasz").fill("Pruszków");
+  await expect(page).toHaveURL(/home=Pruszk/);
+  await page.getByLabel("Maksymalnie").selectOption("25");
+  await expect(page).toHaveURL(/distance=25/);
+  const results = page.getByRole("region", { name: "Wyniki" });
+  await expect(
+    results.getByRole("heading", { name: "AI Product Manager", exact: true }),
+  ).toBeVisible();
+  await expect(results.getByRole("heading", { name: "Machine Learning Engineer" })).toHaveCount(0);
+  await expect(results.getByRole("heading", { name: "Staff AI Engineer" })).toBeVisible();
+  await expect(results).toContainText("km od Ciebie");
+  // Controlled checkbox: state follows the URL, so click and then assert.
+  await page.getByRole("checkbox", { name: "Pokaż też pracę zdalną" }).click();
+  await expect(page.getByRole("checkbox", { name: "Pokaż też pracę zdalną" })).not.toBeChecked();
+  await expect(results.getByRole("heading", { name: "Staff AI Engineer" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByLabel("Gdzie mieszkasz")).toHaveValue("Pruszków");
+  await page.goto("/#/oferty");
+  await page.getByRole("checkbox", { name: "Z dodatkiem relokacyjnym" }).click();
+  await expect(page.getByRole("checkbox", { name: "Z dodatkiem relokacyjnym" })).toBeChecked();
+  await expect(page).toHaveURL(/relocation=1/);
+  await expect(results.locator("article")).toHaveCount(2);
+  for (const card of await results.locator("article").all())
+    await expect(card).toContainText("Relokacja");
+});
+
+test("DoRoboty design: one Inter typeface, K3 cards, K1 buttons and local illustrations", async ({
+  page,
+}) => {
+  const external: string[] = [];
+  page.on("request", (r) => {
+    if (!r.url().startsWith("http://127.0.0.1:3106") && !r.url().startsWith("data:"))
+      external.push(r.url());
+  });
+  await page.goto("/#/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Wiesz, czego szukają. Pokazujesz, co umiesz.",
+  );
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.evaluate(() => document.fonts.check('16px "Inter Variable"'))).toBe(true);
+  const fonts = await page.evaluate(() => [
+    ...new Set(
+      [...document.querySelectorAll("h1, h2, h3, p, a, button, input, dd")].map(
+        (el) => getComputedStyle(el).fontFamily.split(",")[0],
+      ),
+    ),
+  ]);
+  expect(fonts).toEqual(['"Inter Variable"']);
+  const card = page.locator("article.dr-job").first();
+  await expect(card).toHaveCSS("border-radius", "8px");
+  await expect(card).toHaveCSS("border-top-color", "rgb(230, 218, 196)");
+  await expect(card).toHaveCSS("box-shadow", /rgba\(25, 47, 82, 0\.06\)/);
+  await expect(card.locator(".ds-tile-human")).toHaveCSS("background-color", "rgb(17, 15, 21)");
+  await expect(card.locator(".ds-tag--must").first()).toHaveText("Konieczne");
+  await expect(card.getByRole("link", { name: /^Czytaj więcej/ })).toBeVisible();
+  const apply = card.getByRole("link", { name: /^Aplikuj/ });
+  await expect(apply).toHaveCSS("background-color", "rgb(17, 15, 21)");
+  await expect(apply).toHaveCSS("border-radius", "6px");
+  await apply.hover();
+  await expect(apply).toHaveCSS("background-color", "rgb(25, 47, 82)");
+  const images = await page.locator("main img, body > div img").evaluateAll((list) =>
+    list.map((img) => ({
+      src: (img as HTMLImageElement).src,
+      ok: (img as HTMLImageElement).naturalWidth > 0,
+    })),
+  );
+  expect(images.some((x) => x.src.includes("ilu-02"))).toBe(true);
+  expect(images.every((x) => x.ok)).toBe(true);
+  expect(await page.locator("img[src*='people']").count()).toBe(0);
+  for (const path of ["/#/oferty", "/#/oferty/ai-product-manager", "/#/dla-firm", "/#/regulamin"]) {
+    await page.goto(path);
+    expect(
+      await page.evaluate(() =>
+        [...document.querySelectorAll("*")].some((el) =>
+          /Geist|Arial/.test(getComputedStyle(el).fontFamily.split(",")[0]),
+        ),
+      ),
+    ).toBe(false);
   }
-  for (const [width, title, salary] of [
-    [1280, "64px", "24px"],
-    [850, "46px", "20px"],
-    [390, "47px", "25px"],
-  ] as const) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/#/oferty/ai-product-manager");
-    await expect(page.locator(".pp-offer-hero h1")).toHaveCSS("font-size", title);
-    await expect(page.locator(".pp-offer-pay .pp-salary-tag")).toHaveCSS("font-size", salary);
-  }
+  expect(external).toEqual([]);
 });
 
 test("offer section links survive copied URLs and restore section focus through history", async ({
@@ -620,77 +689,119 @@ test("offer section links survive copied URLs and restore section focus through 
   context,
 }) => {
   await page.goto("/#/oferty/ai-product-manager");
-  const employer = page.getByRole("link", { name: "O firmie", exact: true });
+  const toc = page.getByRole("navigation", { name: "Sekcje oferty" });
+  const employer = toc.getByRole("link", { name: "O firmie", exact: true });
   const destination = await employer.evaluate((link) => (link as HTMLAnchorElement).href);
-  expect(destination).toContain("#/oferty/ai-product-manager#employer");
+  expect(destination).toContain("#/oferty/ai-product-manager#firma");
   await employer.focus();
   await page.keyboard.press("Enter");
-  await expect(page.locator("#employer")).toBeFocused();
-  await expect(page).toHaveURL(/#\/oferty\/ai-product-manager#employer$/);
+  await expect(page.locator("#firma")).toBeFocused();
+  await expect(page).toHaveURL(/#\/oferty\/ai-product-manager#firma$/);
   const copied = await context.newPage();
   await copied.goto(destination);
-  await expect(copied.locator(".pp-offer-hero h1")).toHaveText("AI Product Manager");
-  await expect(copied.locator("#employer")).toBeFocused();
-  expect((await copied.locator("#employer").boundingBox())!.y).toBeLessThan(50);
+  await expect(copied.getByRole("heading", { level: 1 })).toHaveText("AI Product Manager");
+  await expect(copied.locator("#firma")).toBeFocused();
+  expect((await copied.locator("#firma").boundingBox())!.y).toBeLessThan(100);
   await copied.close();
-  await page.getByRole("link", { name: "O roli", exact: true }).click();
-  await expect(page.locator("#role")).toBeFocused();
+  await toc.getByRole("link", { name: "O roli", exact: true }).click();
+  await expect(page.locator("#o-roli")).toBeFocused();
   await page.goBack();
-  await expect(page.locator("#employer")).toBeFocused();
+  await expect(page.locator("#firma")).toBeFocused();
   await page.goForward();
-  await expect(page.locator("#role")).toBeFocused();
+  await expect(page.locator("#o-roli")).toBeFocused();
 });
 
 for (const width of [1280, 390])
   test(`keyboard chip removal keeps a logical focus successor at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/#/oferty?query=Product&remote=remote");
-    const remote = page.getByRole("button", { name: "Usuń filtr: remote", exact: true });
+    const remote = page.getByRole("button", { name: "Usuń filtr: Zdalnie", exact: true });
     await remote.focus();
     await page.keyboard.press("Enter");
     const query = page.getByRole("button", { name: "Usuń filtr: Product", exact: true });
     await expect(query).toBeFocused();
     await expect(page).not.toHaveURL(/remote=/);
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("heading", { name: "Oferty pracy", exact: true })).toBeFocused();
-    await expect(page.getByRole("textbox", { name: "Szukaj ofert", exact: true })).toHaveValue("");
+    await expect(page.getByRole("heading", { name: "Wyniki", exact: true })).toBeFocused();
+    await expect(page.getByRole("searchbox", { name: "Szukaj ofert", exact: true })).toHaveValue(
+      "",
+    );
   });
 
-test("homepage surfaces and marketplace action type roles match the shared reference", async ({
+test("public DoRoboty pages: hero, for companies, terms and sign-in simulation", async ({
   page,
 }) => {
-  await page.goto("/#/");
-  const cards = page.locator("main article.prototype-panel");
-  await expect(cards).toHaveCount(3);
-  for (const card of await cards.all()) {
-    // DoRoboty theme (owner decision): 8px cards with a light navy shadow.
-    await expect(card).toHaveCSS("border-radius", "8px");
-    await expect(card).toHaveCSS("box-shadow", /rgba\(25, 47, 82, 0\.06\)/);
-  }
-  for (const [width, searchSize, offerSize, payLine] of [
-    [1280, "14px", "14px", "34.8px"],
-    [1100, "14px", "13px", "31.9px"],
-    [850, "12px", "12px", "29px"],
-    [700, "12px", "14px", "36.25px"],
-    [600, "12px", "14px", "33.75px"],
-    [390, "12px", "14px", "33.75px"],
-  ] as const) {
+  for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/#/oferty");
-    const search = page.getByRole("button", { name: "Szukaj", exact: true });
-    await expect(search).toHaveCSS("font-size", searchSize);
-    await expect(search).toHaveCSS("font-weight", "600");
-    await expect(search).toHaveCSS("letter-spacing", "normal");
-    await expect(search).toHaveCSS("line-height", `${parseInt(searchSize) * 1.5}px`);
-    await expect(search).toHaveCSS("border-top-width", "1px");
-    await expect(search).toHaveCSS("box-shadow", "none");
-    await page.goto("/#/oferty/ai-product-manager");
-    const action = page.locator(".pp-offer-actions a").first();
-    await expect(action).toHaveCSS("font-size", offerSize);
-    await expect(action).toHaveCSS("font-weight", "600");
-    await expect(action).toHaveCSS("line-height", `${parseInt(offerSize) * 1.5}px`);
-    await expect(page.locator(".pp-offer-pay .pp-salary-tag")).toHaveCSS("line-height", payLine);
+    for (const [path, heading] of [
+      ["/#/", "Wiesz, czego szukają."],
+      ["/#/dla-firm", "Opowiedz o roli."],
+      ["/#/regulamin", "Regulamin serwisu DoRoboty.ai"],
+      ["/#/auth/sign-in?audience=employer", "Wejdź do panelu firmy"],
+    ] as const) {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { level: 1 })).toContainText(heading);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+      const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+      expect(results.violations.filter((v) => ["serious", "critical"].includes(v.impact!))).toEqual(
+        [],
+      );
+    }
   }
+  await page.goto("/#/");
+  await page.getByRole("button", { name: "Lead", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Lead", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "Szukaj ofert", exact: true }).click();
+  await expect(page).toHaveURL(/category=lead/);
+  await page.goto("/#/auth/sign-in?audience=candidate");
+  await page.getByText("Firma", { exact: true }).click();
+  await expect(page).toHaveURL(/audience=employer/);
+  await page.getByRole("button", { name: "Wejdź jako Karolina Wiśniewska", exact: true }).click();
+  await expect(page).toHaveURL(/#\/app\/oferty$/);
+});
+
+test("Moje aplikacje is reachable only from the signed-in account menu", async ({ page }) => {
+  await page.goto("/#/oferty");
+  const nav = page.getByRole("navigation", { name: "Główna nawigacja" });
+  await expect(nav.getByRole("button", { name: /Menu konta/ })).toHaveCount(0);
+  await expect(nav.getByRole("link", { name: /aplikacje/i })).toHaveCount(0);
+  await page.goto("/#/app/aplikacje");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wybierz osobę");
+  await page.getByRole("button", { name: "Wejdź jako Anna Kowalska", exact: true }).click();
+  await page.goto("/#/oferty");
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 800 });
+    await nav.getByRole("button", { name: "Menu konta: Anna Kowalska" }).click();
+    await page.getByRole("menuitem", { name: "Moje aplikacje" }).click();
+    await expect(page).toHaveURL(/#\/app\/aplikacje$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Moje aplikacje");
+    await page.goto("/#/oferty");
+  }
+});
+
+test("employer panel lists the company's ads and filters applications per ad", async ({ page }) => {
+  await choose(page, "Karolina Wiśniewska");
+  await page.goto("/#/app/kandydaci");
+  const ads = page.getByRole("region", { name: "Ogłoszenia" });
+  await expect(ads.getByRole("button", { name: /Wszystkie ogłoszenia/ })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  await expect(page.getByRole("link", { name: "Marek Nowak", exact: true })).toBeVisible();
+  await ads.getByRole("button", { name: /AI Operations Specialist/ }).click();
+  await expect(page).toHaveURL(/oferta=/);
+  await expect(page.getByRole("link", { name: "Marek Nowak", exact: true })).toHaveCount(0);
+  await ads.getByRole("button", { name: /AI Product Manager/ }).click();
+  await expect(page.getByRole("link", { name: "Marek Nowak", exact: true })).toBeVisible();
+  await page.getByText("Nowe", { exact: true }).click();
+  await expect(page.getByRole("link", { name: "Marek Nowak", exact: true })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
 test("process sheet keeps notes across keyboard tabs and saves stage history with focus", async ({
@@ -810,11 +921,17 @@ for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     await choose(page, "Anna Kowalska");
     await page.goto("/#/oferty/ai-product-manager");
-    const gap = await page.locator(".pp-offer-actions").evaluate((element) => {
-      const [apply, save] = element.querySelectorAll("a, button");
-      return save.getBoundingClientRect().top - apply.getBoundingClientRect().bottom;
-    });
-    expect(gap).toBeGreaterThanOrEqual(10);
+    // K1 button group: primary first, secondary beside it with an 8 px gap (or wrapped below).
+    const gap = await page
+      .getByRole("complementary", { name: "Podsumowanie oferty" })
+      .locator(".ds-btn-group")
+      .evaluate((element) => {
+        const [apply, save] = [...element.querySelectorAll("a, button")].map((x) =>
+          x.getBoundingClientRect(),
+        );
+        return save.top >= apply.bottom ? save.top - apply.bottom : save.left - apply.right;
+      });
+    expect(gap).toBeGreaterThanOrEqual(8);
     await page.getByRole("link", { name: "Aplikuj", exact: true }).click();
     const offer = page.getByRole("complementary", { name: "AI Product Manager", exact: true });
     await expect(offer).toContainText("BrightLabs");

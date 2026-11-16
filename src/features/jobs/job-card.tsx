@@ -1,64 +1,110 @@
 import { Link } from "react-router";
-import { ArrowUpRight, Bookmark, MapPin, Monitor } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { usePrototype } from "@/features/prototype/store";
 import type { JobWithCompany } from "./types";
-import { categoryLabels, functionLabels, remoteLabels, seniorityLabels } from "./presentation";
+import { categoryLabels, seniorityLabels } from "./presentation";
 import { CompanyLogo } from "./company-logo";
-import { SalaryFact } from "./salary-fact";
-export function JobCard({ job, saved }: { job: JobWithCompany; saved?: boolean }) {
-  const { run } = usePrototype();
+import { modeText, payText, publishedAgo, relocationText } from "./offer";
+
+export function Requirements({ job }: { job: JobWithCompany }) {
+  if (!job.mustHave?.length && !job.niceToHave?.length) return null;
   return (
-    <article className="pp-job-card">
-      <CompanyLogo company={job.company} />
-      <div className="pp-job-main">
-        <div className="pp-job-topline">
-          <Link className="pp-job-company" to={`/firmy/${job.company.slug}`}>
-            {job.company.name}
-          </Link>
-          <span className="pp-separator">/</span>
-          <span className="pp-job-category">{categoryLabels[job.category]}</span>
-        </div>
-        <h3 className="pp-job-title">
-          <Link to={`/oferty/${job.slug}`}>{job.title}</Link>
-        </h3>
-        <div className="pp-job-facts">
-          <span>
-            <MapPin className="pp-icon" />
-            {job.locations.join(" / ")}
-          </span>
-          <span>
-            <Monitor className="pp-icon" />
-            {remoteLabels[job.remoteStatus]}
-          </span>
-          <span>{seniorityLabels[job.seniority]}</span>
-        </div>
-        <div className="pp-job-tags">
-          <span>{functionLabels[job.function]}</span>
+    <ul className="dr-reqs" aria-label="Wymagania">
+      {job.mustHave?.map((item) => (
+        <li className="ds-req" key={`must-${item}`}>
+          <span className="ds-tag ds-tag--must">Konieczne</span>
+          {item}
+        </li>
+      ))}
+      {job.niceToHave?.map((item) => (
+        <li className="ds-req" key={`nice-${item}`}>
+          <span className="ds-tag ds-tag--nice">Mile widziane</span>
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** K3 offer card: meta → title → facts → key competence → requirements → actions. */
+export function JobCard({
+  job,
+  saved,
+  distance,
+}: {
+  job: JobWithCompany;
+  saved?: boolean;
+  distance?: number | null;
+}) {
+  const { run } = usePrototype();
+  const relocation = relocationText(job);
+  return (
+    <article className="ds-card dr-job" aria-labelledby={`job-${job.id}`}>
+      <div className="dr-job-top">
+        <CompanyLogo company={job.company} size="small" />
+        <div className="min-w-0">
+          <p className="ds-meta">
+            <Link className="dr-job-company" to={`/firmy/${job.company.slug}`}>
+              {job.company.name}
+            </Link>{" "}
+            · {publishedAgo(job)}
+          </p>
+          <h3 id={`job-${job.id}`} className="dr-job-title">
+            <Link to={`/oferty/${job.slug}`}>{job.title}</Link>
+          </h3>
         </div>
       </div>
-      <div className="pp-job-side">
-        <div className="pp-job-side-top">
-          <span className="pp-job-age">
-            {new Intl.DateTimeFormat("pl-PL").format(new Date(job.publishedAt))}
-          </span>
-          {saved !== undefined && (
-            <Button
-              className="pp-save-button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Zapisz ofertę: ${job.title}`}
-              aria-pressed={saved}
-              onClick={() => run({ type: "toggle_saved", jobId: job.id })}
-            >
-              <Bookmark className="pp-icon" />
-            </Button>
-          )}
+      <dl className="ds-facts dr-job-facts">
+        <div>
+          <dt>Kategoria</dt>
+          <dd>
+            {categoryLabels[job.category]} · {seniorityLabels[job.seniority]}
+          </dd>
         </div>
-        <SalaryFact job={job} />
-        <Link className="pp-detail-button" to={`/oferty/${job.slug}`}>
-          Zobacz rolę <ArrowUpRight className="pp-icon" />
+        <div>
+          <dt>Widełki</dt>
+          <dd>{payText(job)}</dd>
+        </div>
+        <div>
+          <dt>Tryb</dt>
+          <dd>
+            {modeText(job)}
+            {distance != null && ` · ${distance} km od Ciebie`}
+          </dd>
+        </div>
+        {relocation && (
+          <div>
+            <dt>Relokacja</dt>
+            <dd>{relocation}</dd>
+          </div>
+        )}
+      </dl>
+      {job.keySkill && (
+        <>
+          <p className="ds-label">Kluczowa kompetencja</p>
+          <div className="ds-tile-human dr-key">{job.keySkill}</div>
+        </>
+      )}
+      <Requirements job={job} />
+      <div className="ds-btn-group dr-job-actions">
+        <Link className="ds-btn ds-btn--primary" to={`/aplikuj/${job.slug}`}>
+          Aplikuj
+          <span className="sr-only">: {job.title}</span>
         </Link>
+        <Link className="ds-btn ds-btn--secondary" to={`/oferty/${job.slug}`}>
+          Czytaj więcej
+          <span className="sr-only">: {job.title}</span>
+        </Link>
+        {saved !== undefined && (
+          <button
+            type="button"
+            className="ds-btn ds-btn--secondary dr-save"
+            aria-pressed={saved}
+            aria-label={`Zapisz ofertę: ${job.title}`}
+            onClick={() => run({ type: "toggle_saved", jobId: job.id })}
+          >
+            {saved ? "Zapisano" : "Zapisz"}
+          </button>
+        )}
       </div>
     </article>
   );

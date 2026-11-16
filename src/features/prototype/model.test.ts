@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { initialState, transition, stateSchema, type State } from "./model";
+import { initialState, publishedJobs, transition, stateSchema, type State } from "./model";
 const time = "2026-11-03T10:00:00.000Z";
 function as(state: State, id: string) {
   return transition(state, { type: "select_person", id });
@@ -137,5 +137,30 @@ describe("coherent browser scenario", () => {
     expect(() =>
       transition(state, { type: "publish", job: { ...updated, salaryMin: 500, salaryMax: 1 } }),
     ).toThrow();
+  });
+});
+
+describe("DoRoboty offer segments", () => {
+  it("parses a saved scenario without the new optional fields and fills them from seed data", () => {
+    const legacy = JSON.parse(JSON.stringify(initialState()));
+    for (const job of legacy.jobs) {
+      delete job.keySkill;
+      delete job.mustHave;
+      delete job.relocation;
+    }
+    for (const company of legacy.companies) delete company.benefits;
+    const state = stateSchema.parse(legacy);
+    const job = publishedJobs(state).find((x) => x.slug === "ai-product-manager")!;
+    expect(job.keySkill).toBe("Prowadzenie wdrożeń AI od discovery do wyniku");
+    expect(job.mustHave).toHaveLength(2);
+    expect(job.company.benefits?.some((x) => x.startsWith("Budżet edukacyjny"))).toBe(true);
+  });
+
+  it("keeps values the scenario already has", () => {
+    const state = initialState();
+    state.jobs[0].keySkill = "Własna kompetencja";
+    expect(publishedJobs(state).find((x) => x.id === state.jobs[0].id)!.keySkill).toBe(
+      "Własna kompetencja",
+    );
   });
 });
