@@ -4,6 +4,7 @@ import type { JobWithCompany } from "./types";
 import { categoryLabels, seniorityLabels } from "./presentation";
 import { CompanyLogo } from "./company-logo";
 import { modeText, payText, publishedAgo, relocationText } from "./offer";
+import posthog from "posthog-js";
 
 export function Requirements({ job }: { job: JobWithCompany }) {
   if (!job.mustHave?.length && !job.niceToHave?.length) return null;
@@ -100,7 +101,13 @@ export function JobCard({
             className="ds-btn ds-btn--secondary dr-save"
             aria-pressed={saved}
             aria-label={`Zapisz ofertę: ${job.title}`}
-            onClick={() => run({ type: "toggle_saved", jobId: job.id })}
+            onClick={() => {
+              if (run({ type: "toggle_saved", jobId: job.id }) && posthog.__loaded)
+                posthog.capture(saved ? "job_unsaved" : "job_saved", {
+                  job_id: job.id,
+                  job_category: job.category,
+                });
+            }}
           >
             {saved ? "Zapisano" : "Zapisz"}
           </button>
